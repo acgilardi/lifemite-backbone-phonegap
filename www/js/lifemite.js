@@ -11719,5 +11719,5 @@ var AppView = require('./app-view')
 var appView = new AppView();
 
 
-},{"./app-view":1}]},{},[2])
+},{"./app-view":1}]},{},[1,2])
 ;

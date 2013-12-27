@@ -2,7 +2,7 @@
 module.exports = function (grunt) {
 
     require('time-grunt')(grunt);
-    require('load-grunt-tasks')(grunt);
+    //require('load-grunt-tasks')(grunt,{ pattern: ['grunt-*', '!grunt-cli']} );
 
     // Project configuration.
     grunt.initConfig({
@@ -22,6 +22,9 @@ module.exports = function (grunt) {
             build: ['build'],
             dev: {
                 src: ['build/app.js']
+            },
+            test: {
+                src: ['build/app.js','build/spec.js']
             }
         },
 
@@ -39,7 +42,7 @@ module.exports = function (grunt) {
             },
             app: {
                 files: {
-                    'build/app.js': ['client/src/app.js']
+                    'build/app.js': ['client/src/**/*.js']
                 },
                 options: {
                     external: ['jquery', 'underscore', 'backbone']
@@ -75,24 +78,68 @@ module.exports = function (grunt) {
             }
         },
 
+        jshint: {
+            files: ['Gruntfile.js', 'client/src/**/*.js'],
+            options: {
+                curly: true,
+                eqeqeq: true,
+                immed: true,
+                latedef: true,
+                newcap: true,
+                noarg: true,
+                sub: true,
+                undef: true,
+                boss: true,
+                devel: true,
+                eqnull: true,
+                browser: true,
+                globals: {
+                    cordova: true
+                }
+            }
+        },
+
+        watch: {
+            files: [
+                ['client/src/**/*.js', 'client/spec/**/*.js']
+            ],
+            tasks: ['build:test'],
+            karma: {
+                files: ['client/src/**/*.js', 'client/spec/**/*.js'],
+                tasks: ['karma:unit:run']
+            }
+        },
+
         karma: {
             unit: {
                 configFile: './karma.conf.js',
-                background: false
+                background: false,
+                autoWatch: true
             }
         }
     });
+
+    // Load tasks
+    grunt.loadNpmTasks('grunt-browserify');
+    //grunt.loadNpmTasks('grunt-bower');
+    //grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-karma');
 
     // Custom tasks
     grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor']);
 
     grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'concat', 'copy:dev', 'uglify'])
+    grunt.registerTask('build:test', ['browserify:app', 'browserify:test']);
 
-    //grunt.registerTask("clean", ['clean:dev']);
+    grunt.registerTask('tdd', ['karma:unit','watch']);
 
-    //grunt.registerTask('devmode', ['karma:unit', 'watch']);
-
-
+    grunt.registerTask('server', ['watch']);
 
     //grunt.registerTask('min', ['uglify']); // polyfil for uglify
 //    grunt.registerTask('debug', 'Create a debug build', function (platform) {
@@ -101,7 +148,7 @@ module.exports = function (grunt) {
 //    });
 
     // Default task
-    //grunt.registerTask('default', ['browserify', 'jshint', 'concat', 'min']);
+    //grunt.registerTask('default', ['watch']);
 
 
 

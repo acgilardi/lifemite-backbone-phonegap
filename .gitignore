@@ -1,7 +1,7 @@
-node_modules
-dist
+/node_modules
+/build
 test/temp
 .sass-cache
-bower_components
+/bower_components
 .tmp
 

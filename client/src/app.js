@@ -1,4 +1,11 @@
-var AppView = require('./app-view')
+var Router = require('./router.js');
+var Settings = require('./models/settings.js')
 
-var appView = new AppView();
+app = new function(){
+    this.router = new Router();
+    this.settings = new Settings();
+};
+
+
+
 
