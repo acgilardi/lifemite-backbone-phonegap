@@ -45,6 +45,7 @@ module.exports = function (grunt) {
                     'build/app.js': ['client/src/**/*.js']
                 },
                 options: {
+                    transform: ['hbsfy'],
                     external: ['jquery', 'underscore', 'backbone']
                 }
             },
@@ -53,6 +54,7 @@ module.exports = function (grunt) {
                     'build/spec.js': ['client/spec/**/*.test.js']
                 },
                 options: {
+                    transform: ['hbsfy'],
                     external: ['jquery', 'underscore', 'backbone']
                 }
             }
@@ -63,11 +65,32 @@ module.exports = function (grunt) {
         },
 
         copy: {
+            test: {
+                src: './SpecRunner.html',
+                dest: 'build/SpecRunner.html'
+            },
             dev: {
-                files: [{
+                files: [
+                    {
                     src: 'build/<%= pkg.name %>.js',
                     dest: 'www/js/<%= pkg.name %>.js'
-                }]
+                    }, {
+                        expand: true,
+                        flatten: true,
+                        src: 'client/img/*',
+                        dest: 'www/img/'
+                    }, {
+                        expand: true,
+                        flatten: true,
+                        src: 'client/css/*',
+                        dest: 'www/css/'
+                    }, {
+                        expand: true,
+                        flatten: true,
+                        src: 'client/cordova/*',
+                        dest: 'www/'
+                    }
+                ]
             }
         },
 
@@ -121,7 +144,7 @@ module.exports = function (grunt) {
 
     // Load tasks
     grunt.loadNpmTasks('grunt-browserify');
-    //grunt.loadNpmTasks('grunt-bower');
+    grunt.loadNpmTasks('grunt-bower');
     //grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -130,9 +153,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('hbsfy');
+    grunt.loadNpmTasks('grunt-contrib-handlebars');
+
 
     // Custom tasks
-    grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor']);
+    grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor', 'copy:test']);
 
     grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'concat', 'copy:dev', 'uglify'])
     grunt.registerTask('build:test', ['browserify:app', 'browserify:test']);

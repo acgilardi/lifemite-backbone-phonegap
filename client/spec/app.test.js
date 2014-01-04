@@ -1,4 +1,13 @@
+var App = require('../src/app.js'),
+    Backbone = require('backbone');
+
 describe('lifemite', function() {
+
+    beforeEach(function() {
+        Backbone.history.stop();
+        app = new App();
+        app.initialize();
+    });
 
     it('should have app object', function() {
         expect(app).toBeDefined();
@@ -10,9 +19,7 @@ describe('lifemite', function() {
         });
 
         it("should contain settings", function () {
-            expect(app.settings).toBeDefined();
+            expect(app.models.settings).toBeDefined();
         });
-
-
     });
 });

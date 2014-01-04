@@ -1,5 +1,6 @@
-var Backbone = require('backbone');
-var Settings = require('../src/models/settings.js')
+var Backbone = require('backbone'),
+    Settings = require('../src/models/settings.js');
+
 
 describe('settings', function() {
 
@@ -16,15 +17,15 @@ describe('settings', function() {
     });
 
     it('should be a Backbone.Model', function() {
-        expect(app.settings).toBeA(Backbone.Model);
+        expect(app.models.settings).toBeA(Backbone.Model);
     });
 
     it(" should have a first visit flag default to true", function () {
-        expect(app.settings.get('firstVisit')).toEqual(true);
+        expect(app.models.settings.get('firstVisit')).toEqual(true);
     });
 
     it("should store current locale as i18n string default to en-US", function () {
-        expect(app.settings.get('locale')).toEqual('en-US');
+        expect(app.models.settings.get('locale')).toEqual('en-US');
     });
 
 });
