@@ -40,6 +40,10 @@ module.exports = function (grunt) {
                     ]
                 }
             },
+            flatui: {
+                src: ['client/flatui/**/*.js'],
+                dest: 'build/flatui.js'
+            },
             app: {
                 files: {
                     'build/app.js': ['client/src/**/*.js']
@@ -60,8 +64,20 @@ module.exports = function (grunt) {
             }
         },
 
+        less: {
+            transpile: {
+                files: {
+                    'build/<%= pkg.name %>.css': [
+                        'client/vendor/*/css/*',
+                        'client/css/**/*.css',
+                        'client/less/**/*.less'
+                    ]
+                }
+            }
+        },
+
         concat: {
-            'build/<%= pkg.name %>.js': ['build/vendor.js','build/app.js']
+            'build/<%= pkg.name %>.js': ['build/vendor.js','build/flatui.js', 'build/app.js']
         },
 
         copy: {
@@ -72,23 +88,38 @@ module.exports = function (grunt) {
             dev: {
                 files: [
                     {
-                    src: 'build/<%= pkg.name %>.js',
-                    dest: 'www/js/<%= pkg.name %>.js'
+                        src: 'build/<%= pkg.name %>.js',
+                        dest: 'www/js/<%= pkg.name %>.js'
+                    }, {
+                        src: 'build/<%= pkg.name %>.css',
+                        dest: 'www/css/<%= pkg.name %>.css'
                     }, {
                         expand: true,
                         flatten: true,
                         src: 'client/img/*',
-                        dest: 'www/img/'
-                    }, {
-                        expand: true,
-                        flatten: true,
-                        src: 'client/css/*',
-                        dest: 'www/css/'
+                        dest: 'www/images/'
                     }, {
                         expand: true,
                         flatten: true,
                         src: 'client/cordova/*',
                         dest: 'www/'
+                    },{
+                        expand: true,
+                        flatten: true,
+                        src: 'flatui/css/**/*.css',
+                        dest: 'www/css/'
+                    }, {
+                        expand: true,
+                        flatten: true,
+                        src: 'flatui/js/**/*.js',
+                        dest: 'www/js/'
+                    }, {
+                        expand: true,
+                        cwd: 'flatui/',
+                        src: '**',
+                        dest: 'www/',
+                        flatten: false,
+                        filter: 'isFile'
                     }
                 ]
             }
@@ -124,9 +155,9 @@ module.exports = function (grunt) {
 
         watch: {
             files: [
-                ['client/src/**/*.js', 'client/spec/**/*.js']
+                ['client/src/**/*.js', 'client/spec/**/*.js', 'client/templates/**/*.hbs']
             ],
-            tasks: ['build:test'],
+            tasks: ['build'],
             karma: {
                 files: ['client/src/**/*.js', 'client/spec/**/*.js'],
                 tasks: ['karma:unit:run']
@@ -155,12 +186,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('hbsfy');
     grunt.loadNpmTasks('grunt-contrib-handlebars');
+    grunt.loadNpmTasks('grunt-contrib-less');
 
 
     // Custom tasks
-    grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor', 'copy:test']);
+    grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor', 'browserify:flatui', 'copy:test']);
 
-    grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'concat', 'copy:dev', 'uglify'])
+    grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'less:transpile', 'concat', 'copy:dev', 'uglify'])
     grunt.registerTask('build:test', ['browserify:app', 'browserify:test']);
 
     grunt.registerTask('tdd', ['karma:unit','watch']);
