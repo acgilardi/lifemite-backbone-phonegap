@@ -1,5 +1,5 @@
 var Backbone = require('backbone'),
-    Settings = require('../src/models/settings.js');
+    Settings = require('../src/models/preferences.js');
 
 
 describe('settings', function() {

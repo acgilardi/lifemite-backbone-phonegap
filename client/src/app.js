@@ -1,31 +1,51 @@
+require('./app_config');
+
 var Jquery = require('jquery'),
-    Router = require('./router.js'),
-    Settings = require('./models/settings.js'),
-    Backbone = require('backbone');
+    Router = require('./router'),
+    Helpers = require('./helpers'),
+    Preferences = require('./models/preferences'),
+    Backbone = require('backbone'),
+    DataService = require('./services/data'),
+    Upgrades = require('./services/upgrades'),
+    I18n = require('./services/i18n');
 
 Backbone.$ = Jquery;
 
-// Add a close() function to all Backbone.Views. Check for beforeClose()
-Backbone.View.prototype.close = function () {
-    if (this.beforeClose) {
-        this.beforeClose();
-    }
-    Backbone.$(this.el).empty();
-    this.unbind();
-};
-
-var App = module.exports = function App(){};
+var App = module.exports = function(){};
 
 App.prototype = {
+    loc: {},
     views: {},
     models: {},
     collections: {},
     router: {},
+    db: {},
+
     initialize: function() {
         this.bindEvents();
+        this.loc = new I18n({
+            //these are the default values, you can omit
+            directory: "locales",
+            locale: AppConfig.language,
+            extension: ".json"
+        });
         this.router = new Router();
-        this.models.settings = new Settings();
-        Backbone.history.start();
+
+        var me = this;
+
+        // instantiate indexeddb
+        var options = {
+            databaseName: AppConfig.databaseName,
+            version: AppConfig.databaseVersion,
+            forceNew: AppConfig.databaseForceRebuild,
+            upgrades: Upgrades()
+        };
+        DataService(options, function(error, db) {
+            console.log('DataService complete');
+            me.db = db;
+            //me.models.settings = new Settings();
+            Backbone.history.start();
+        });
     },
     // Bind Event Listeners
     // Bind any events that are required on startup. Common events are:

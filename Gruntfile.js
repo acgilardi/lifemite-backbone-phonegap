@@ -12,8 +12,7 @@ module.exports = function (grunt) {
             install: {
                 options: {
                     targetDir: 'client/vendor',
-                    layout: 'byComponent',
-                    cleanTargetDir: true
+                    layout: 'byComponent'
                 }
             }
         },
@@ -36,7 +35,8 @@ module.exports = function (grunt) {
                     alias: [
                         'client/vendor/jquery/js/jquery.js:jquery',
                         'client/vendor/backbone/js/backbone.js:backbone',
-                        'client/vendor/underscore/js/underscore.js:underscore'
+                        'client/vendor/underscore/js/underscore.js:underscore',
+                        'client/vendor/sprintf/js/sprintf.js:sprintf'
                     ]
                 }
             },
@@ -50,7 +50,7 @@ module.exports = function (grunt) {
                 },
                 options: {
                     transform: ['hbsfy'],
-                    external: ['jquery', 'underscore', 'backbone']
+                    external: ['jquery', 'underscore', 'backbone', 'sprintf']
                 }
             },
             test: {
@@ -59,7 +59,7 @@ module.exports = function (grunt) {
                 },
                 options: {
                     transform: ['hbsfy'],
-                    external: ['jquery', 'underscore', 'backbone']
+                    external: ['jquery', 'underscore', 'backbone', 'sprintf']
                 }
             }
         },
@@ -120,6 +120,11 @@ module.exports = function (grunt) {
                         dest: 'www/',
                         flatten: false,
                         filter: 'isFile'
+                    }, {
+                        expand: true,
+                        flatten: true,
+                        src: 'client/locales/*',
+                        dest: 'www/locales/'
                     }
                 ]
             }
@@ -176,7 +181,7 @@ module.exports = function (grunt) {
     // Load tasks
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-bower');
-    //grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');

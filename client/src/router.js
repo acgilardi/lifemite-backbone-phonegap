@@ -1,5 +1,6 @@
 var Backbone = require('backbone'),
-    TodayView = require('./views/today');
+    TodayView = require('./views/today'),
+    Template = require('./models/template');
 
 var Router = module.exports = Backbone.Router.extend({
     initialize: function(options) {
@@ -7,14 +8,36 @@ var Router = module.exports = Backbone.Router.extend({
     },
     routes: {
         '': 'root',
-        ':step': 'navigateStep'
+        ':step': 'navigateStep',
+        'settings': 'settingsDetails'
+
     },
     root: function() {
         this.today();
     },
+
+    // handle data
+    settingsDetails: function() {
+
+    },
+
     today: function() {
-        this.showView(new TodayView());
-        this.navigate('today');
+        var template = new Template({id: 1});
+        var holdData;
+
+        var me = this;
+        template.fetch({
+            success: function(data) {
+                var s = "hod";
+                holdData = data;
+
+                me.showView(new TodayView({model: holdData}));
+                me.navigate('today');
+            }
+        });
+
+        //this.showView(new TodayView({model: holdData}));
+        //this.navigate('today');
     },
     navigateStep: function(stepName) {
         if(this[stepName] !== undefined) {
