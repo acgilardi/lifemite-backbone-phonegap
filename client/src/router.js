@@ -1,6 +1,7 @@
 var Backbone = require('backbone'),
     TodayView = require('./views/today'),
-    Template = require('./models/template');
+    Template = require('./models/template'),
+    Templates = require('./collections/templates');
 
 var Router = module.exports = Backbone.Router.extend({
     initialize: function(options) {
@@ -33,6 +34,14 @@ var Router = module.exports = Backbone.Router.extend({
 
                 me.showView(new TodayView({model: holdData}));
                 me.navigate('today');
+            }
+        });
+
+        var templates = new Templates();
+        var data2;
+        templates.fetch({
+            success: function(data) {
+                data2 = data;
             }
         });
 
