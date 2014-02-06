@@ -10,6 +10,32 @@ var Upgrade1 = module.exports = function() {
             "template"
         ],
         saves: {
+            "goal":[
+                {
+                    _id: 1,
+                    title: "Goal 1",
+                    description: "This is goal 1",
+                    profile_id: 1,
+                    template_id: 1,
+                    goaldate: "",
+                    metgoal: false,
+                    thingid_guid: '',
+                    thingversion_guid: '',
+                    lastupdate: ''
+                },
+                {
+                    _id: 2,
+                    title: "Goal 2",
+                    description: "This is goal 2",
+                    profile_id: 1,
+                    template_id: 2,
+                    goaldate: "",
+                    metgoal: false,
+                    thingid_guid: '',
+                    thingversion_guid: '',
+                    lastupdate: ''
+                }
+            ],
             "category":[
                 {
                     "_id": 1,
