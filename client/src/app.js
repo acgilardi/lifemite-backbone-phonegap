@@ -7,7 +7,8 @@ var Jquery = require('jquery'),
     Backbone = require('backbone'),
     DataService = require('./services/data'),
     Upgrades = require('./services/upgrades'),
-    I18n = require('./services/i18n');
+    I18n = require('./services/i18n'),
+    Templates = require('./collections/templates');
 
 Backbone.$ = Jquery;
 
@@ -43,8 +44,20 @@ App.prototype = {
         DataService(options, function(error, db) {
             console.log('DataService complete');
             me.db = db;
+
+            // get templates
+            me.collections.templates = new Templates();
+            me.collections.templates.fetch({
+                success: function(data) {
+                    console.log('templates fetched');
+                    Backbone.history.start();
+                }
+            });
+
             //me.models.settings = new Settings();
-            Backbone.history.start();
+
+
+
         });
     },
     // Bind Event Listeners

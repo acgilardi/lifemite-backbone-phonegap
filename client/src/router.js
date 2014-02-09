@@ -3,6 +3,8 @@ var Backbone = require('backbone'),
     AddView = require('./views/add'),
     Template = require('./models/template'),
     Templates = require('./collections/templates'),
+    Goal = require('./models/goal'),
+    Goals = require('./collections/goals'),
     PageSlider = require('./services/pageslider');
 
 var Router = module.exports = Backbone.Router.extend({
@@ -30,26 +32,29 @@ var Router = module.exports = Backbone.Router.extend({
         var holdData;
 
         var me = this;
-        template.fetch({
-            success: function(data) {
-                var s = "hod";
-                holdData = data;
-
-                me.showView(new TodayView({model: holdData}));
-                me.navigate('today');
-            }
-        });
-
-//        var templates = new Templates();
-//        var data2;
-//        templates.fetch({
+//        template.fetch({
 //            success: function(data) {
-//                data2 = data;
+//                var s = "hod";
+//                holdData = data;
+//
+//                me.showView(new TodayView({model: holdData}));
+//                me.navigate('today');
 //            }
 //        });
 
-        //this.showView(new TodayView({model: holdData}));
-        //this.navigate('today');
+//        var goals = new Goals();
+//        var data2;
+//        goals.fetch({
+//            success: function(data) {
+//                data2 = data;
+//
+//                me.showView(new TodayView({collection: data}));
+//                me.navigate('today');
+//            }
+//        });
+
+        this.showView(new TodayView(/*{model: holdData}*/));
+        this.navigate('today');
     },
     add: function() {
         me = this;
@@ -62,12 +67,12 @@ var Router = module.exports = Backbone.Router.extend({
             this[stepName]();
         }
     },
-    showView: function(view, model) {
+    showView: function(view) {
         this.destroyCurrentView();
 
         app.views.currentView = view;
         //app.views.currentView.setElement(Backbone.$('.lifemite-app')).render();
-        view.render();
+        //view.render();
         this.slider.slidePage(view.$el);
     },
     destroyCurrentView: function() {

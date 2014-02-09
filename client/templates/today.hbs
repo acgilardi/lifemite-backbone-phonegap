@@ -1,4 +1,4 @@
-<div class="navbar navbar-inverse navbar-fixed-top">
+<div id="today-menu" class="navbar navbar-fixed-top">
     <div class="navbar-header">
         <img src="images/Logo1440.png" style="height: 32px;" />
         <ul class="nav pull-right">
@@ -7,21 +7,40 @@
         </ul>
     </div>
 </div>
-<div class="navbar navbar-fixed-top" style="margin-top: 50px;">
-    <div style="display:-webkit-flex;-webkit-flex-direction: row; width: 100%; background-color: #1ABC9C;">
-        <div style="display: inline;-webkit-flex:1;text-align: left;"><</div>
-        <div style="display: inline;-webkit-flex:20; text-align: center;">Middle</div>
-        <div style="display: inline;-webkit-flex:1; text-align: right;">></div>
-    </div>
+<div id="today-datebar" class="navbar navbar-fixed-top" >
+    <ul class="pager">
+        <li class="previous">
+            <a href="">
+                <i class="fui-arrow-left"></i>
+            </a>
+        </li>
+        <li class="text-center">
+            <div style="display: inline-block; padding-top: 6px;">Today Jan 15th 2014</div>
+        </li>
+        <li class="next">
+            <a href="">
+                <i class="fui-arrow-right"></i>
+            </a>
+        </li>
+    </ul>
+
+    <!--<div style="display:-webkit-flex;-webkit-flex-direction: row; width: 100%; background-color: #2c3e50;">-->
+        <!--<div style="display: inline;-webkit-flex:1;text-align: left;"><</div>-->
+        <!--<div style="display: inline;-webkit-flex:20; text-align: center;">Today Jan 15th, 2014</div>-->
+        <!--<div style="display: inline;-webkit-flex:1; text-align: right;">></div>-->
+    <!--</div>-->
 </div>
 
-<div class="navbar navbar-inverse navbar-fixed-bottom">
+
+
+<div class="scroller">
+    <div id="goals-view"></div>
+</div>
+
+
+<div id="today-statusbar" class="navbar navbar-fixed-bottom">
     <div class="navbar-header">
 
     </div>
-</div>
-
-<div class="scroller">
-    <div id="today-goals"></div>
 </div>
 
