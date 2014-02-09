@@ -5,4 +5,5 @@ test/temp
 /bower_components
 .tmp
 /www
+/platforms
 
