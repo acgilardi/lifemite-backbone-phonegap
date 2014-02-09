@@ -10416,6 +10416,144 @@ if ( typeof window === "object" && typeof window.document === "object" ) {
 
 },{}],"jquery":[function(require,module,exports){
 module.exports=require('Zm6qs6');
+},{}],"orzEXB":[function(require,module,exports){
+/*! sprintf.js | Copyright (c) 2007-2013 Alexandru Marasteanu <hello at alexei dot ro> | 3 clause BSD license */
+
+(function(ctx) {
+	var sprintf = function() {
+		if (!sprintf.cache.hasOwnProperty(arguments[0])) {
+			sprintf.cache[arguments[0]] = sprintf.parse(arguments[0]);
+		}
+		return sprintf.format.call(null, sprintf.cache[arguments[0]], arguments);
+	};
+
+	sprintf.format = function(parse_tree, argv) {
+		var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
+		for (i = 0; i < tree_length; i++) {
+			node_type = get_type(parse_tree[i]);
+			if (node_type === 'string') {
+				output.push(parse_tree[i]);
+			}
+			else if (node_type === 'array') {
+				match = parse_tree[i]; // convenience purposes only
+				if (match[2]) { // keyword argument
+					arg = argv[cursor];
+					for (k = 0; k < match[2].length; k++) {
+						if (!arg.hasOwnProperty(match[2][k])) {
+							throw(sprintf('[sprintf] property "%s" does not exist', match[2][k]));
+						}
+						arg = arg[match[2][k]];
+					}
+				}
+				else if (match[1]) { // positional argument (explicit)
+					arg = argv[match[1]];
+				}
+				else { // positional argument (implicit)
+					arg = argv[cursor++];
+				}
+
+				if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
+					throw(sprintf('[sprintf] expecting number but found %s', get_type(arg)));
+				}
+				switch (match[8]) {
+					case 'b': arg = arg.toString(2); break;
+					case 'c': arg = String.fromCharCode(arg); break;
+					case 'd': arg = parseInt(arg, 10); break;
+					case 'e': arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential(); break;
+					case 'f': arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg); break;
+					case 'o': arg = arg.toString(8); break;
+					case 's': arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg); break;
+					case 'u': arg = arg >>> 0; break;
+					case 'x': arg = arg.toString(16); break;
+					case 'X': arg = arg.toString(16).toUpperCase(); break;
+				}
+				arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+'+ arg : arg);
+				pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
+				pad_length = match[6] - String(arg).length;
+				pad = match[6] ? str_repeat(pad_character, pad_length) : '';
+				output.push(match[5] ? arg + pad : pad + arg);
+			}
+		}
+		return output.join('');
+	};
+
+	sprintf.cache = {};
+
+	sprintf.parse = function(fmt) {
+		var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
+		while (_fmt) {
+			if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
+				parse_tree.push(match[0]);
+			}
+			else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
+				parse_tree.push('%');
+			}
+			else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
+				if (match[2]) {
+					arg_names |= 1;
+					var field_list = [], replacement_field = match[2], field_match = [];
+					if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+						field_list.push(field_match[1]);
+						while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+							if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+								field_list.push(field_match[1]);
+							}
+							else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
+								field_list.push(field_match[1]);
+							}
+							else {
+								throw('[sprintf] huh?');
+							}
+						}
+					}
+					else {
+						throw('[sprintf] huh?');
+					}
+					match[2] = field_list;
+				}
+				else {
+					arg_names |= 2;
+				}
+				if (arg_names === 3) {
+					throw('[sprintf] mixing positional and named placeholders is not (yet) supported');
+				}
+				parse_tree.push(match);
+			}
+			else {
+				throw('[sprintf] huh?');
+			}
+			_fmt = _fmt.substring(match[0].length);
+		}
+		return parse_tree;
+	};
+
+	var vsprintf = function(fmt, argv, _argv) {
+		_argv = argv.slice(0);
+		_argv.splice(0, 0, fmt);
+		return sprintf.apply(null, _argv);
+	};
+
+	/**
+	 * helpers
+	 */
+	function get_type(variable) {
+		return Object.prototype.toString.call(variable).slice(8, -1).toLowerCase();
+	}
+
+	function str_repeat(input, multiplier) {
+		for (var output = []; multiplier > 0; output[--multiplier] = input) {/* do nothing */}
+		return output.join('');
+	}
+
+	/**
+	 * export to either browser or node.js
+	 */
+	ctx.sprintf = sprintf;
+	ctx.vsprintf = vsprintf;
+})(typeof exports != "undefined" ? exports : window);
+
+},{}],"sprintf":[function(require,module,exports){
+module.exports=require('orzEXB');
 },{}],"Jqoxb8":[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
@@ -11696,39 +11834,72 @@ module.exports=require('Zm6qs6');
 
 },{}],"underscore":[function(require,module,exports){
 module.exports=require('Jqoxb8');
-},{}]},{},["nOVI1B","Zm6qs6","Jqoxb8"])
+},{}]},{},["Zm6qs6","nOVI1B","orzEXB","Jqoxb8"])
 ;
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({},{},[])
 ;
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require('./app_config');
+
 var Jquery = require('jquery'),
-    Router = require('./router.js'),
-    Settings = require('./models/settings.js'),
-    Backbone = require('backbone');
+    Router = require('./router'),
+    Helpers = require('./helpers'),
+    Preferences = require('./models/preferences'),
+    Backbone = require('backbone'),
+    DataService = require('./services/data'),
+    Upgrades = require('./services/upgrades'),
+    I18n = require('./services/i18n'),
+    Templates = require('./collections/templates');
 
 Backbone.$ = Jquery;
 
-// Add a close() function to all Backbone.Views. Check for beforeClose()
-Backbone.View.prototype.close = function () {
-    if (this.beforeClose) {
-        this.beforeClose();
-    }
-    Backbone.$(this.el).empty();
-    this.unbind();
-};
-
-var App = module.exports = function App(){};
+var App = module.exports = function(){};
 
 App.prototype = {
+    loc: {},
     views: {},
     models: {},
     collections: {},
     router: {},
+    db: {},
+
     initialize: function() {
         this.bindEvents();
+        this.loc = new I18n({
+            //these are the default values, you can omit
+            directory: "locales",
+            locale: AppConfig.language,
+            extension: ".json"
+        });
         this.router = new Router();
-        this.models.settings = new Settings();
-        Backbone.history.start();
+
+        var me = this;
+
+        // instantiate indexeddb
+        var options = {
+            databaseName: AppConfig.databaseName,
+            version: AppConfig.databaseVersion,
+            forceNew: AppConfig.databaseForceRebuild,
+            upgrades: Upgrades()
+        };
+        DataService(options, function(error, db) {
+            console.log('DataService complete');
+            me.db = db;
+
+            // get templates
+            me.collections.templates = new Templates();
+            me.collections.templates.fetch({
+                success: function(data) {
+                    console.log('templates fetched');
+                    Backbone.history.start();
+                }
+            });
+
+            //me.models.settings = new Settings();
+
+
+
+        });
     },
     // Bind Event Listeners
     // Bind any events that are required on startup. Common events are:
@@ -11759,40 +11930,308 @@ App.prototype = {
 
 
 
-},{"./models/settings.js":3,"./router.js":4}],2:[function(require,module,exports){
+},{"./app_config":2,"./collections/templates":4,"./helpers":5,"./models/preferences":8,"./router":10,"./services/data":11,"./services/i18n":12,"./services/upgrades":15}],2:[function(require,module,exports){
+AppConfig = {
+    databaseName: 'lifemitedb',
+    databaseVersion: 1,
+    databaseForceRebuild: true,
+    //language: 'de'
+    language: navigator.language.toLowerCase()
+};
+},{}],3:[function(require,module,exports){
+var jQuery = require('jquery'),
+    Backbone = require('backbone'),
+    Goal = require('../models/goal');
+
+Backbone.$ = jQuery;
+
+var Goals = module.exports = Backbone.Collection.extend({
+    model: Goal,
+    sync: function(method, collection, options) {
+        options = options || {};
+
+        switch (method) {
+            case 'create':
+                break;
+
+            case 'update':
+                break;
+
+            case 'delete':
+                break;
+
+            case 'read':
+                this.find().done(function (data) {
+                    options.success(data);
+                });
+                break;
+        }
+    },
+    find: function () {
+        var deferred = $.Deferred();
+
+        app.db.goal.find(function(error, goals) {
+            deferred.resolve(goals);
+        });
+        return deferred.promise();
+    }
+});
+
+
+
+},{"../models/goal":7}],4:[function(require,module,exports){
+var jQuery = require('jquery'),
+    Backbone = require('backbone'),
+    Template = require('../models/template');
+
+Backbone.$ = jQuery;
+
+var Templates = module.exports = Backbone.Collection.extend({
+    model: Template,
+    sync: function(method, collection, options) {
+        options = options || {};
+
+        switch (method) {
+            case 'create':
+                break;
+
+            case 'update':
+                break;
+
+            case 'delete':
+                break;
+
+            case 'read':
+                this.find().done(function (data) {
+                    options.success(data);
+                });
+                break;
+        }
+    },
+    find: function () {
+        var deferred = $.Deferred();
+
+        app.db.template.find(function(error, templates) {
+            deferred.resolve(templates);
+        });
+        return deferred.promise();
+    }
+});
+
+
+
+},{"../models/template":9}],5:[function(require,module,exports){
+var Backbone = require('backbone'),
+    _ = require('underscore');
+
+// Add a close() function to all Backbone.Views. Check for beforeClose()
+Backbone.View.prototype.close = function () {
+    if (this.beforeClose) {
+        this.beforeClose();
+    }
+    this.$el.empty();
+    this.undelegateEvents();
+    this.unbind();
+};
+
+Backbone.View.prototype.assign = function (selector, view) {
+    var selectors;
+
+    if (_.isObject(selector)) {
+        selectors = selector;
+    }
+    else {
+        selectors = {};
+        selectors[selector] = view;
+    }
+
+    if (!selectors) return;
+
+    _.each(selectors, function (view, selector) {
+        view.setElement(this.$(selector)).render();
+    }, this);
+};
+},{}],6:[function(require,module,exports){
 var App = require('./app');
 
 app = new App();
 app.initialize();
 
-},{"./app":1}],3:[function(require,module,exports){
+},{"./app":1}],7:[function(require,module,exports){
+var jQuery = require('jquery'),
+    Backbone = require('backbone');
+
+Backbone.$ = jQuery;
+
+var Goal = module.exports = Backbone.Model.extend({
+
+    initialize: function () {
+        //this.reports = new ReportsCollection();
+        //this.reports.parent = this;
+    },
+
+    sync: function (method, model, options) {
+
+        options = options || {};
+
+        switch (method) {
+            case 'create':
+                break;
+
+            case 'update':
+                break;
+
+            case 'delete':
+                break;
+
+            case 'read':
+                this.findById(parseInt(this.id)).done(function (data) {
+                    options.success(data);
+                });
+                break;
+        }
+    },
+
+
+    findById: function (id) {
+        var deferred = $.Deferred();
+        app.db.goal.find({_id: id}, function(error, templates) {
+            deferred.resolve(templates[0]);
+        });
+        return deferred.promise();
+    }
+});
+},{}],8:[function(require,module,exports){
 var Backbone = require('backbone');
 
-var Settings = module.exports = Backbone.Model.extend({
+var Preferences = module.exports = Backbone.Model.extend({
     defaults: {
         firstVisit: true,
         locale: 'en-US'
+    },
+    urlRoot: "/settings",
+    initialize: function() {
     }
 });
 
-},{}],4:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
+var jQuery = require('jquery'),
+    Backbone = require('backbone');
+
+Backbone.$ = jQuery;
+
+var Template = module.exports = Backbone.Model.extend({
+
+    initialize: function () {
+        //this.reports = new ReportsCollection();
+        //this.reports.parent = this;
+    },
+
+    sync: function (method, model, options) {
+
+        options = options || {};
+
+        switch (method) {
+            case 'create':
+                break;
+
+            case 'update':
+                break;
+
+            case 'delete':
+                break;
+
+            case 'read':
+                this.findById(parseInt(this.id)).done(function (data) {
+                    options.success(data);
+                });
+                break;
+        }
+    },
+
+
+    findById: function (id) {
+        var deferred = $.Deferred();
+
+//        for (i = 0; i < l; i = i + 1) {
+//            if (this.employees[i].id === id) {
+//                employee = this.employees[i];
+//                break;
+//            }
+//        }
+
+        app.db.template.find({_id: id}, function(error, templates) {
+            deferred.resolve(templates[0]);
+        });
+
+        //deferred.resolve(employee);
+        return deferred.promise();
+    }
+});
+},{}],10:[function(require,module,exports){
 var Backbone = require('backbone'),
-    TodayView = require('./views/today');
+    TodayView = require('./views/today'),
+    AddView = require('./views/add'),
+    Template = require('./models/template'),
+    Templates = require('./collections/templates'),
+    Goal = require('./models/goal'),
+    Goals = require('./collections/goals'),
+    PageSlider = require('./services/pageslider');
 
 var Router = module.exports = Backbone.Router.extend({
     initialize: function(options) {
-        this.views = ['today', 'about', 'listinfo', 'coi'];
+        this.views = ['today', 'add'];
+        this.slider = new PageSlider($('body'));
     },
     routes: {
         '': 'root',
-        ':step': 'navigateStep'
+        ':step': 'navigateStep',
+        'settings': 'settingsDetails'
+
     },
     root: function() {
         this.today();
     },
+
+    // handle data
+    settingsDetails: function() {
+
+    },
+
     today: function() {
-        this.showView(new TodayView());
+        var template = new Template({id: 1});
+        var holdData;
+
+        var me = this;
+//        template.fetch({
+//            success: function(data) {
+//                var s = "hod";
+//                holdData = data;
+//
+//                me.showView(new TodayView({model: holdData}));
+//                me.navigate('today');
+//            }
+//        });
+
+//        var goals = new Goals();
+//        var data2;
+//        goals.fetch({
+//            success: function(data) {
+//                data2 = data;
+//
+//                me.showView(new TodayView({collection: data}));
+//                me.navigate('today');
+//            }
+//        });
+
+        this.showView(new TodayView(/*{model: holdData}*/));
         this.navigate('today');
+    },
+    add: function() {
+        me = this;
+        //me.slider.slidePage(new AddView().$el);
+        me.showView(new AddView());
+        me.navigate('add');
     },
     navigateStep: function(stepName) {
         if(this[stepName] !== undefined) {
@@ -11803,7 +12242,9 @@ var Router = module.exports = Backbone.Router.extend({
         this.destroyCurrentView();
 
         app.views.currentView = view;
-        app.views.currentView.setElement(Backbone.$('.lifemite-app')).render();
+        //app.views.currentView.setElement(Backbone.$('.lifemite-app')).render();
+        //view.render();
+        this.slider.slidePage(view.$el);
     },
     destroyCurrentView: function() {
         if(app.views.currentView) {
@@ -11814,18 +12255,944 @@ var Router = module.exports = Backbone.Router.extend({
 });
 
 
-},{"./views/today":5}],5:[function(require,module,exports){
+},{"./collections/goals":3,"./collections/templates":4,"./models/goal":7,"./models/template":9,"./services/pageslider":13,"./views/add":16,"./views/today":20}],11:[function(require,module,exports){
+var _ = require('underscore');
+
+var DataService = module.exports = function (options, callback) {
+
+    var verifyCollections = function (upgrade, callback) {
+
+        var addCollections = function (upgrade) {
+
+            var addRecords = function(store) {
+                // Perform all adds for collections that we ar just creating now
+                _.each(upgrade.saves[collection], function(record) {
+                    store.add(record);
+                }, store);
+            };
+
+            for (var i = 0; i < options.collections.length; i++) {
+                var collection = options.collections[i];
+                if (!db.objectStoreNames.contains(collection)) {
+                    var store = db.createObjectStore(collection, {keyPath:"_id", autoIncrement:true});
+                    addRecords(store);
+                    delete upgrade.saves[collection];
+                }
+            }
+        };
+
+        var removeCollections = function () {
+            for (var i = 0; i < db.objectStoreNames.length; i++) {
+                var collection = db.objectStoreNames[i];
+                if (options.collections.indexOf(collection) === -1) {
+                    db.deleteObjectStore(collection);
+                }
+            }
+        };
+
+        addCollections(upgrade);
+        removeCollections();
+
+        if (typeof callback === "function") {
+            callback(upgrade);
+        }
+    };
+
+    var prepareBrowserDbInstance = function (upgrade, callback) {
+
+        var browserDbInstance;
+
+        var getCollectionApiInstance = function (collection) {
+            var transaction, store;
+            var findObjectsByQuery = function (transaction, store, query, onlyOne, callback) {
+                var objectQueryTest = function (query, object) {
+                    if (typeof query !== "object") return false;
+                    else {
+                        for (var clause in query) {
+                            var definition = query[clause];
+                            if (typeof definition !== "object") {
+                                if (object[clause] instanceof Array && object[clause].indexOf(definition) === -1) return false;
+                                else if (!(object[clause] instanceof Array) && object[clause] !== definition) return false;
+                            } else {
+                                for (var operator in definition) {
+                                    var value = definition[operator];
+                                    var operation;
+                                    switch (operator) {
+                                        case '$gt':
+                                            operation = object[clause] > value;
+                                            break;
+                                        case '$gte':
+                                            operation = object[clause] >= value;
+                                            break;
+                                        case '$lt':
+                                            operation = object[clause] < value;
+                                            break;
+                                        case '$lte':
+                                            operation = object[clause] <= value;
+                                            break;
+                                        case '$ne':
+                                            operation = object[clause] !== value;
+                                            break;
+                                        case '$nin':
+                                            operation = value instanceof Array && value.indexOf(object[clause]) === -1;
+                                            break;
+                                        case '$mod':
+                                            operation = value instanceof Array && value.length === 2 && object[clause] % value[0] === value[1];
+                                            break;
+                                        case '$size':
+                                            operation = object[clause] instanceof Array && object[clause].length === value;
+                                            break;
+                                        case '$exists':
+                                            operation = Boolean(object[clause]) === value;
+                                            break;
+                                        case '$typeof':
+                                            operation = typeof object[clause] === value;
+                                            break;
+                                        case '$nottypeof':
+                                            operation = typeof object[clause] !== value;
+                                            break;
+                                    }
+                                    if (!operation) return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                };
+                var result = [];
+                var openCursorRequest = store.openCursor();
+                openCursorRequest.onerror = function (event) {
+                    if (typeof callback === "function") callback(event);
+                };
+                openCursorRequest.onsuccess = function (event) {
+                    var cursor = event.target.result;
+                    if (cursor && cursor.key) {
+                        var getRequest = store.get(cursor.key);
+                        getRequest.onerror = function (event) {
+                            if (typeof callback === "function") callback(event);
+                        };
+                        getRequest.onsuccess = function (event) {
+                            if (!query) {
+                                result.push(event.target.result);
+                                if (onlyOne && result.length === 1) callback(undefined, result, event);
+                            } else {
+                                if (objectQueryTest(query, event.target.result)) result.push(event.target.result);
+                            }
+                            cursor.continue();
+                        };
+                    } else {
+                        callback(undefined, result, event);
+                    }
+                };
+            };
+            return {
+                save:function (object, callback) {
+                    transaction = db.transaction([collection], "readwrite");
+                    store = transaction.objectStore(collection);
+                    var saveRequest = store.put(object);
+                    saveRequest.onerror = function (event) {
+                        if (typeof callback === "function") callback(event);
+                    };
+                    saveRequest.onsuccess = function (event) {
+                        var getRequest = store.get(event.target.result);
+                        getRequest.onerror = function (event) {
+                            if (typeof callback === "function") callback(event);
+                        };
+                        getRequest.onsuccess = function (event) {
+                            if (typeof callback === "function") callback(undefined, event.target.result, event);
+                        };
+                    };
+                },
+                remove:function () {
+                    transaction = db.transaction([collection], "readwrite");
+                    store = transaction.objectStore(collection);
+                    var query = (typeof arguments[0] === "object") ? arguments[0] : undefined;
+                    var callback = (typeof arguments[arguments.length - 1] === "function") ? arguments[arguments.length - 1] : undefined;
+                    findObjectsByQuery(transaction, store, query, false, function (error, result, event) {
+                        result.forEach(function (object) {
+                            store.delete(object._id);
+                        });
+                        if (typeof callback === "function") callback(error, true, event);
+                    });
+                },
+                find:function () {
+                    var query = (typeof arguments[0] === "object") ? arguments[0] : undefined;
+                    var callback = (typeof arguments[arguments.length - 1] === "function") ? arguments[arguments.length - 1] : undefined;
+                    if (!callback) throw new Error("Callback required");
+                    else {
+                        transaction = db.transaction([collection], "readwrite");
+                        store = transaction.objectStore(collection);
+                        findObjectsByQuery(transaction, store, query, false, function (error, result, event) {
+                            callback(error, result, event);
+                        });
+                    }
+                },
+                findOne:function () {
+                    var query = (typeof arguments[0] === "object") ? arguments[0] : undefined;
+                    var callback = (typeof arguments[arguments.length - 1] === "function") ? arguments[arguments.length - 1] : undefined;
+                    if (!callback) throw new Error("Callback required");
+                    else {
+                        transaction = db.transaction([collection], "readwrite");
+                        store = transaction.objectStore(collection);
+                        findObjectsByQuery(transaction, store, query, false, function (error, result, event) {
+                            callback(error, result[0], event);
+                        });
+                    }
+                },
+                findById:function (id, callback) {
+                    transaction = db.transaction([collection], "readwrite");
+                    store = transaction.objectStore(collection);
+                    var getRequest = store.get(id);
+                    getRequest.onerror = function (event) {
+                        if (typeof callback === "function") callback(event);
+                    };
+                    getRequest.onsuccess = function (event) {
+                        if (typeof callback === "function") callback(undefined, event.target.result, event);
+                    };
+                }
+            };
+        };
+
+        browserDbInstance = {};
+
+        upgrade.collections.forEach(function (collection) {
+            browserDbInstance[collection] = getCollectionApiInstance(collection);
+        });
+
+        browserDbInstance.delete = function (callback) {
+            var deleteRequest = window.indexedDB.deleteDatabase(options.db);
+            deleteRequest.onError = function () {
+                if (typeof callback === "function") {
+                    callback(undefined, event);
+                }
+            };
+            deleteRequest.onSuccess = function (event) {
+                if (typeof callback === "function") {
+                    callback(undefined, event);
+                }
+            };
+        };
+
+        if (typeof callback === "function") {
+            callback(upgrade, browserDbInstance);
+        }
+    };
+
+    window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+
+    var me = this;
+    var db;
+    var openDbRequest;
+    var openDatabase = function() {
+        openDbRequest = window.indexedDB.open(options.databaseName, options.version);
+        openDbRequest.onerror = function (event) {
+            console.log('browserdb: error');
+        };
+
+        openDbRequest.onsuccess = function (event) {
+            db = event.target.result;
+            prepareBrowserDbInstance(_.last(upgrades), callback);
+        };
+
+        openDbRequest.onupgradeneeded = function(event) {
+            db = event.target.result;
+            trans = event.target.transaction;
+
+            var updateDb = function(upgrade, BrowserDb) {
+
+                // handle saves and deletes for existing collections
+                _.each(upgrade.saves, function(records, collectionName, list) {
+                    if(db.objectStoreNames.contains(collectionName)) {
+                        var collection = trans.objectStore(collectionName);
+                        _.each(records, function(record, index) {
+                            collection.add(record);
+                        });
+                    }
+                }, trans);
+
+                //TODO: Do all upddates here
+                //TODO: Do all deletes here
+
+               //callback(undefined, BrowserDb);
+            };
+
+            for (var ver = event.oldVersion + 1; ver <= event.newVersion; ver++) {
+                for(var up = 0; up < upgrades.length; up++) {
+                    var upgrade = options.upgrades[up];
+
+                    if(upgrade.version === ver) {
+                        options.collections = upgrade.collections;
+
+                        // this will create collections and add any upgrade data to these new collections
+                        verifyCollections(upgrade, updateDb
+                            //prepareBrowserDbInstance(upgrade, updateDb)
+                        );
+                    }
+                }
+            }
+        };
+    };
+
+    if(options.forceNew) {
+        var reqDelete = window.indexedDB.deleteDatabase(options.databaseName);
+        reqDelete.onerror = function(event) {
+        };
+        reqDelete.onsuccess = function(event) {
+            openDatabase();
+        };
+    } else {
+        openDatabase();
+    }
+};
+
+},{}],12:[function(require,module,exports){
+var I18n = module.exports = function(options){
+    for (var prop in options) {
+        this[prop] = options[prop];
+    }
+
+    this.setLocale(this.locale);
+};
+
+I18n.localeCache = {};
+
+I18n.prototype = {
+    defaultLocale: "en-us",
+    directory: "/locales",
+    extension: ".min.json",
+
+    getLocale: function(){
+        return this.locale;
+    },
+
+    setLocale: function(locale){
+        if(!locale)
+            locale = $("html").attr("lang");
+
+        if(!locale)
+            locale = this.defaultLocale;
+
+        this.locale = locale;
+
+        if(locale in I18n.localeCache)
+        {
+            return;
+        }
+        else
+        {
+            this.getLocaleFileFromServer();
+        }
+    },
+
+    getLocaleFileFromServer: function(){
+        localeFile = null;
+
+        $.ajax({
+            url: this.directory + "/" + this.locale + this.extension,
+            async: false,
+            dataType: 'json',
+            success: function(data){
+                localeFile = data;
+            }
+        });
+
+        I18n.localeCache[this.locale] = localeFile;
+    },
+
+    __: function(){
+        var msg = I18n.localeCache[this.locale][arguments[0]];
+
+        if (arguments.length > 1)
+            msg = vsprintf(msg, Array.prototype.slice.call(arguments, 1));
+
+        return msg;
+    },
+
+    __n: function(singular, count){
+        var msg = I18n.localeCache[this.locale][singular];
+
+        count = parseInt(count, 10);
+        if(count === 0)
+            msg = msg.zero;
+        else
+            msg = count > 1 ? msg.other : msg.one;
+
+        msg = vsprintf(msg, [count]);
+
+        if (arguments.length > 2)
+            msg = vsprintf(msg, Array.prototype.slice.call(arguments, 2));
+
+        return msg;
+    }
+};
+
+},{}],13:[function(require,module,exports){
+var $ = require('jquery');
+
+var PageSlider = module.exports = function PageSlider(container) {
+
+    var currentPage,
+        stateHistory = [];
+
+    this.back = function () {
+        location.hash = stateHistory[stateHistory.length - 2];
+    };
+
+    // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
+    this.slidePage = function (page) {
+
+        var l = stateHistory.length,
+            state = window.location.hash;
+
+        if (l === 0) {
+            stateHistory.push(state);
+            this.slidePageFrom(page);
+            return;
+        }
+        if (state === stateHistory[l - 2]) {
+            stateHistory.pop();
+            this.slidePageFrom(page, 'page-left');
+        } else {
+            stateHistory.push(state);
+            this.slidePageFrom(page, 'page-right');
+        }
+
+    };
+
+    // Use this function directly if you want to control the sliding direction outside PageSlider
+    this.slidePageFrom = function (page, from) {
+
+        container.append(page);
+
+        if (!currentPage || !from) {
+            page.attr("class", "page page-center");
+            currentPage = page;
+            return;
+        }
+
+        // Position the page at the starting position of the animation
+        page.attr("class", "page " + from);
+
+        currentPage.one('webkitTransitionEnd', function (e) {
+            $(e.target).remove();
+        });
+
+        // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
+        container[0].offsetWidth;
+
+        // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
+        page.attr("class", "page transition page-center");
+        currentPage.attr("class", "page transition " + (from === "page-left" ? "page-right" : "page-left"));
+        currentPage = page;
+    };
+
+};
+
+},{}],14:[function(require,module,exports){
+var Upgrade1 = module.exports = function() {
+    return {
+        version: 1,
+        collections: [
+            "category",
+            "goal",
+            "preference",
+            "profile",
+            "schedule",
+            "template"
+        ],
+        saves: {
+            "goal":[
+                {
+                    _id: 1,
+                    title: "Goal 1",
+                    description: "This is goal 1",
+                    profile_id: 1,
+                    template_id: 1,
+                    goaldate: "",
+                    metgoal: false,
+                    thingid_guid: '',
+                    thingversion_guid: '',
+                    lastupdate: ''
+                },
+                {
+                    _id: 2,
+                    title: "Goal 2",
+                    description: "This is goal 2",
+                    profile_id: 1,
+                    template_id: 2,
+                    goaldate: "",
+                    metgoal: false,
+                    thingid_guid: '',
+                    thingversion_guid: '',
+                    lastupdate: ''
+                }
+            ],
+            "category":[
+                {
+                    "_id": 1,
+                    "name": app.loc.__("cat-exercise-name"),
+                    "description": app.loc.__("cat-exercise-desc"),
+                    "icon":"exercise_48.png"
+                },
+                {
+                    "_id": 2,
+                    "name":"Measurements",
+                    "description":"All Measurements",
+                    "icon":"measurements_48.png"
+                },
+                {
+                    "_id": 3,
+                    "name":"Diet",
+                    "description":"Diet Related",
+                    "icon":"diet_48.png"
+                },
+                {
+                    "_id": 4,
+                    "name":"Medication",
+                    "description":"Medication and Vitamins",
+                    "icon":"medication_48.png"
+                },
+                {
+                    "_id": 5,
+                    "name":"Lifestyle",
+                    "description":"General Lifestyle",
+                    "icon":"lifestyle_48.png"
+                },
+                {
+                    "id": 6,
+                    "name":"Checklist",
+                    "description":"Checklist Goals",
+                    "icon":"checklist_48.png"
+                }
+            ],
+            "preference": [
+                {
+                    "name": "PrefsSet",
+                    "description": "Did the user visit the preferences yet",
+                    "value": false,
+                    "initialvalue": false
+                },
+                {
+                    "name": "Units",
+                    "description": "Units for distance measurements",
+                    "value": "standard",
+                    "initialvalue": "standard"
+                },
+                {
+                    "name": "ShownStartup",
+                    "description": "Shown the startup screen(s)",
+                    "value": false,
+                    "initialvalue": false
+                }
+            ],
+            "template": [
+                {
+                    "_id": 1,
+                    "type": "timed",
+                    "description": app.loc.__("temp-timed-desc"),
+                    "category_id": "1",
+                    "icon": "timed_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": true,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": app.loc.__("temp-timed-title")
+                },
+                {
+                    "_id": 2,
+                    "type": "distance",
+                    "description": "Exercise tracked by distance",
+                    "category_id": "1",
+                    "icon": "distance_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": true,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": "Distance Exercise"
+                },
+                {
+                    "_id": 3,
+                    "type": "calories",
+                    "description": "Exercise tracked by calories burned",
+                    "category_id": "1",
+                    "icon": "calories_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": true,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": "Calories Burned Exercise"
+                },
+                {
+                    "_id": 4,
+                    "type": "fiber",
+                    "description": "Daily fiber goal",
+                    "category_id": "3",
+                    "icon": "fiber_48",
+                    "ismedication": false,
+                    "isserving": true,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Fiber"
+                },
+                {
+                    "_id": 5,
+                    "type": "vegetables",
+                    "description": "Add and track a daily vegetable goal",
+                    "category_id": "3",
+                    "icon": "vegetables_48",
+                    "ismedication": false,
+                    "isserving": true,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Vegetables"
+                },
+                {
+                    "_id": 6,
+                    "type": "fruit",
+                    "description": "Add and track a daily fruit goal",
+                    "category_id": "3",
+                    "icon": "fruit_48",
+                    "ismedication": false,
+                    "isserving": true,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Fruit"
+                },
+                {
+                    "_id": 7,
+                    "type": "water",
+                    "description": "Add and track a daily water goal",
+                    "category_id": "3",
+                    "icon": "water_48",
+                    "ismedication": false,
+                    "isserving": true,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Water"
+                },
+                {
+                    "_id": 8,
+                    "type": "juicing",
+                    "description": "Add a juicing detox or natural juice diet",
+                    "category_id": "3",
+                    "icon": "juicing_48",
+                    "ismedication": false,
+                    "isserving": true,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Juicing Therapy"
+                },
+                {
+                    "_id": 9,
+                    "type": "medication",
+                    "description": "Add and track a daily medication",
+                    "category_id": "4",
+                    "icon": "medication_48",
+                    "ismedication": true,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": false,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": "Medication"
+                },
+                {
+                    "_id": 10,
+                    "type": "vitamins",
+                    "description": "Add and track a daily suppliment",
+                    "category_id": "4",
+                    "icon": "vitamins_48",
+                    "ismedication": true,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": false,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": "Vitamins"
+                },
+                {
+                    "_id": 11,
+                    "type": "cholesteroldown",
+                    "description": "Add a cholesterol lowering diet",
+                    "category_id": "3",
+                    "icon": "cholesteroldown_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Cholesterol Down"
+                },
+                {
+                    "_id": 12,
+                    "type": "journal",
+                    "description": "Add daily journal entry",
+                    "category_id": "5",
+                    "icon": "journal_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": false,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Journal Entry"
+                },
+                {
+                    "id": 13,
+                    "type": "family",
+                    "description": "Add a goal for time with others",
+                    "category_id": "5",
+                    "icon": "family_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Family"
+                },
+                {
+                    "_id": 14,
+                    "type": "spirituality",
+                    "description": "Add a goal for spiritual reflection",
+                    "category_id": "5",
+                    "icon": "spirituality_48",
+                    "ismedication": false,
+                    "isserving": true,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": "Spirituality"
+                },
+                {
+                    "_id": 15,
+                    "type": "weight",
+                    "description": "Add and track your weight goal",
+                    "category_id": "2",
+                    "icon": "weight_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": true,
+                    "isgoaltracked": true,
+                    "issyncable": true,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Weight"
+                },
+                {
+                    "_id": 16,
+                    "type": "cholesterol",
+                    "description": "Add and track cholesterol levels",
+                    "category_id": "2",
+                    "icon": "cholesterol_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": true,
+                    "isgoaltracked": true,
+                    "issyncable": true,
+                    "syncapis": "",
+                    "allowmultiple": false,
+                    "title": "Weight"
+                },
+                {
+                    "_id": 17,
+                    "type": "bloodpressure",
+                    "description": "Add and track your blood pressure",
+                    "category_id": "2",
+                    "icon": "bloodpressure_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": true,
+                    "isgoaltracked": true,
+                    "issyncable": true,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": "Blood Pressure"
+                },
+                {
+                    "_id": 18,
+                    "type": "checkitem",
+                    "description": "Add a checklist item",
+                    "category_id": "6",
+                    "icon": "checkitem_48",
+                    "ismedication": false,
+                    "isserving": false,
+                    "isscheduled": false,
+                    "isgoaltracked": true,
+                    "issyncable": false,
+                    "syncapis": "",
+                    "allowmultiple": true,
+                    "title": "Checklist Item"
+                }
+            ]
+        }
+    };
+};
+
+},{}],15:[function(require,module,exports){
+var Upgrade1 = require('./upgrade1');
+    //Upgrade2 = require('./upgrade2');
+
+
+var Upgrades = module.exports = function() {
+    // Add upgrades
+    upgrades = [];
+    upgrades.push(Upgrade1());
+    //upgrades.push(Upgrade2());
+
+    return upgrades;
+};
+
+
+},{"./upgrade1":14}],16:[function(require,module,exports){
 var Backbone = require('backbone');
 
-var TodayView = module.exports = Backbone.View.extend({
-    template: require('../../templates/today.hbs'),
+var AddView = module.exports = Backbone.View.extend({
+    template: require('../../templates/add.hbs'),
     render: function() {
-        this.$el.html(this.template(this));
+        this.$el.html(this.template(/*this.model.toJSON()*/));
         return this;
     }
 });
 
-},{"../../templates/today.hbs":6}],6:[function(require,module,exports){
+},{"../../templates/add.hbs":21}],17:[function(require,module,exports){
+var Backbone = require('backbone');
+
+var GoalDistanceView = module.exports = Backbone.View.extend({
+    template: require('../../../templates/goal_templates/distance.hbs'),
+    initialize: function(){
+        //this.goalsView = new Goal
+    },
+    render: function() {
+        this.$el.html(this.template());
+        return this;
+    }
+});
+
+},{"../../../templates/goal_templates/distance.hbs":22}],18:[function(require,module,exports){
+var Backbone = require('backbone');
+
+var GoalTimedView = module.exports = Backbone.View.extend({
+    template: require('../../../templates/goal_templates/timed.hbs'),
+    initialize: function(){
+        //this.goalsView = new Goal
+    },
+    render: function() {
+        this.$el.html(this.template());
+        return this;
+
+    }
+});
+
+},{"../../../templates/goal_templates/timed.hbs":23}],19:[function(require,module,exports){
+var Backbone = require('backbone'),
+    _ = require('underscore'),
+   GoalTimedView = require('./goal_views/timed'),
+   GoalDistanceView = require('./goal_views/distance');
+
+var GoalsView = module.exports = Backbone.View.extend({
+    template: require('../../templates/goals.hbs'),
+    initialize: function(){
+        this.goals = this.collection;
+       // this.goalViews = [];
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template());
+
+        var self = this;
+        this.goals.each(function(goal, index, goals) {
+
+            var template = app.collections.templates.where({_id: goal.get('template_id')})[0];
+            var subView;
+
+            switch (template.get('type')) {
+                case 'timed':
+                    console.log('timedView');
+                    subView = new GoalTimedView({model: goal});
+                    break;
+
+                case 'distance':
+                    console.log('distanceView');
+                    subView = new GoalDistanceView({model: goal});
+                    break;
+            }
+
+            self.$el.append(subView.render().el);
+        }, self);
+
+        return this;
+    }
+});
+},{"../../templates/goals.hbs":24,"./goal_views/distance":17,"./goal_views/timed":18}],20:[function(require,module,exports){
+var Backbone = require('backbone'),
+    GoalsView = require('./goals'),
+    GoalsCollection = require('../collections/goals');
+
+var TodayView = module.exports = Backbone.View.extend({
+    template: require('../../templates/today.hbs'),
+    initialize: function(){
+        this.goals = new GoalsCollection();
+        this.render();
+    },
+    events: {
+        'click #nav-add': 'onAdd'
+    },
+    render: function() {
+        this.$el.html(this.template());
+
+
+        var self = this;
+        console.log('fetching...');
+        this.goals.fetch({
+            success: function(data) {
+                console.log('fetched');
+                var view =  new GoalsView({collection: data});
+                self.assign('#goals-view', view);
+            }
+        });
+
+        return this;
+    },
+
+    onAdd: function() {
+        app.router.add();
+    }
+});
+
+},{"../../templates/today.hbs":25,"../collections/goals":3,"./goals":19}],21:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -11834,10 +13201,58 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"navbar navbar-inverse navbar-fixed-top\">\r\n    <div class=\"navbar-header\">\r\n        <img src=\"images/Logo1440.png\" style=\"height: 32px;\" />\r\n        <ul class=\"nav pull-right\">\r\n            <li><img src=\"images/icons/png/Book.png\" style=\"width:32px;\" /></li>\r\n            <li><img src=\"images/icons/png/compas.png\" style=\"width:32px;\" /></li>\r\n        </ul>\r\n    </div>\r\n</div>\r\n<div class=\"navbar navbar-fixed-top\" style=\"margin-top: 50px;\">\r\n    <div style=\"display:-webkit-flex;-webkit-flex-direction: row; width: 100%; background-color: #1ABC9C;\">\r\n        <div style=\"display: inline;-webkit-flex:1;text-align: left;\"><</div>\r\n        <div style=\"display: inline;-webkit-flex:20; text-align: center;\">Middle</div>\r\n        <div style=\"display: inline;-webkit-flex:1; text-align: right;\">></div>\r\n    </div>\r\n</div>\r\n        <!--\r\n<div class=\"navbar navbar-fixed-top\" style=\"margin-top: 50px;\">\r\n    <div class=\"navbar-header\">\r\n        <button class=\"btn btn-hg pull-left\" style=\"background-color: #16A085;border-radius: 0;\">\r\n            <\r\n        </button>\r\n        <button class=\"btn btn-hg btn-primary\" style=\"text-align:center;background-color: #1ABC9C;border-radius: 0;\">\r\n            Today, Jan 7th\r\n        </button>\r\n        <button class=\"btn btn-hg pull-right\" style=\"background-color: #16A085;border-radius: 0;\">\r\n            >\r\n        </button>\r\n    </div>\r\n</div>-->\r\n<div class=\"navbar navbar-inverse navbar-fixed-bottom\">\r\n    <div class=\"navbar-header\">\r\n\r\n    </div>\r\n</div>\r\n\r\n<div style=\"padding-bottom: 100px\">Test</div>\r\n<div style=\"padding-bottom: 100px\">Test1</div>\r\n<div style=\"padding-bottom: 100px\">Test2</div>\r\n<div style=\"padding-bottom: 100px\">Test3</div>\r\n<div style=\"padding-bottom: 100px\">Test4</div>\r\n<div style=\"padding-bottom: 100px\">Test5</div>\r\n<div style=\"padding-bottom: 100px\">Test6</div>\r\n<div style=\"padding-bottom: 100px\">Test7</div>\r\n<div style=\"padding-bottom: 100px\">Test8</div>\r\n<div style=\"padding-bottom: 100px\">Test9</div>\r\n<div style=\"padding-bottom: 100px\">Test10</div>\r\n";
+  return "<div style=\"background-color: red;\">Add</div>";
   });
 
-},{"hbsfy/runtime":10}],7:[function(require,module,exports){
+},{"hbsfy/runtime":29}],22:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"goal goal-even\">\r\n    <div class=\"goal-titlebar\">\r\n        <div class=\"goal-title\">Running</div>\r\n        <div class=\"goal-desc\">running 2.3 mph</div>\r\n    </div>\r\n    <div class=\"goal-content\">\r\n        Content\r\n    </div>\r\n</div>";
+  });
+
+},{"hbsfy/runtime":29}],23:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"goal goal-odd\">\r\n    <div class=\"goal-titlebar\">\r\n        <div class=\"goal-title\">Jogging</div>\r\n        <div class=\"goal-desc\">jogging on treadmill</div>\r\n    </div>\r\n    <div class=\"goal-content\">\r\n        Content\r\n    </div>\r\n\r\n</div>";
+  });
+
+},{"hbsfy/runtime":29}],24:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div id=\"goals\"></div>";
+  });
+
+},{"hbsfy/runtime":29}],25:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div id=\"today-menu\" class=\"navbar navbar-fixed-top\">\r\n    <div class=\"navbar-header\">\r\n        <img src=\"images/Logo1440.png\" style=\"height: 32px;\" />\r\n        <ul class=\"nav pull-right\">\r\n            <li><img id=\"nav-add\" src=\"images/icons/png/Book.png\" style=\"width:32px; cursor: hand;\" /></li>\r\n            <li><img src=\"images/icons/png/compas.png\" style=\"width:32px;\" /></li>\r\n        </ul>\r\n    </div>\r\n</div>\r\n<div id=\"today-datebar\" class=\"navbar navbar-fixed-top\" >\r\n    <ul class=\"pager\">\r\n        <li class=\"previous\">\r\n            <a href=\"\">\r\n                <i class=\"fui-arrow-left\"></i>\r\n            </a>\r\n        </li>\r\n        <li class=\"text-center\">\r\n            <div style=\"display: inline-block; padding-top: 6px;\">Today Jan 15th 2014</div>\r\n        </li>\r\n        <li class=\"next\">\r\n            <a href=\"\">\r\n                <i class=\"fui-arrow-right\"></i>\r\n            </a>\r\n        </li>\r\n    </ul>\r\n\r\n    <!--<div style=\"display:-webkit-flex;-webkit-flex-direction: row; width: 100%; background-color: #2c3e50;\">-->\r\n        <!--<div style=\"display: inline;-webkit-flex:1;text-align: left;\"><</div>-->\r\n        <!--<div style=\"display: inline;-webkit-flex:20; text-align: center;\">Today Jan 15th, 2014</div>-->\r\n        <!--<div style=\"display: inline;-webkit-flex:1; text-align: right;\">></div>-->\r\n    <!--</div>-->\r\n</div>\r\n\r\n\r\n\r\n<div class=\"scroller\">\r\n    <div id=\"goals-view\"></div>\r\n</div>\r\n\r\n\r\n<div id=\"today-statusbar\" class=\"navbar navbar-fixed-bottom\">\r\n    <div class=\"navbar-header\">\r\n\r\n    </div>\r\n</div>\r\n\r\n";
+  });
+
+},{"hbsfy/runtime":29}],26:[function(require,module,exports){
 /*jshint eqnull: true */
 
 module.exports.create = function() {
@@ -12005,7 +13420,7 @@ Handlebars.registerHelper('log', function(context, options) {
 return Handlebars;
 };
 
-},{}],8:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 exports.attach = function(Handlebars) {
 
 // BEGIN(BROWSER)
@@ -12113,7 +13528,7 @@ return Handlebars;
 
 };
 
-},{}],9:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 exports.attach = function(Handlebars) {
 
 var toString = Object.prototype.toString;
@@ -12198,7 +13613,7 @@ Handlebars.Utils = {
 return Handlebars;
 };
 
-},{}],10:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var hbsBase = require("handlebars/lib/handlebars/base");
 var hbsUtils = require("handlebars/lib/handlebars/utils");
 var hbsRuntime = require("handlebars/lib/handlebars/runtime");
@@ -12209,5 +13624,5 @@ hbsRuntime.attach(Handlebars);
 
 module.exports = Handlebars;
 
-},{"handlebars/lib/handlebars/base":7,"handlebars/lib/handlebars/runtime":8,"handlebars/lib/handlebars/utils":9}]},{},[1,2,3,4,5])
+},{"handlebars/lib/handlebars/base":26,"handlebars/lib/handlebars/runtime":27,"handlebars/lib/handlebars/utils":28}]},{},[1,2,3,4,5,6,8,7,9,10,11,12,13,14,15,17,16,18,19,20])
 ;
