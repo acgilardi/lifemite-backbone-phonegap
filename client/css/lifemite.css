@@ -21,9 +21,13 @@
 .pager li:first-child > a {
     border-right: 2px solid #2c3e50;
 }
-#today-menu {
+#today-menu,
+#add-menu {
     background-color: #3498db;
+    color: white;
 }
+
+
 
 #today-datebar {
     margin-top: 48px;
@@ -40,6 +44,7 @@
 .goal {
     text-transform: none;
     padding: 10px;
+    clear: both;
 }
 .goal-odd {
     background-color: #ffffff;
@@ -64,4 +69,32 @@
 }
 .goal-content {
 
+}
+
+.goal-selector {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.goal-selector-item {
+    display: inline;
+    float: left;
+    padding: 10px;
+    text-align: center;
+}
+.goal-selector-img {
+    width: 32px;
+    height: 32px;
+    margin: 8px;
+}
+
+.goal-selector-block {
+    display: block;
+}
+.goal-selector-block-img {
+    display: block;
+}
+
+.goal-selector-block-label {
+    display: block;
 }

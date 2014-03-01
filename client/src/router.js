@@ -32,35 +32,15 @@ var Router = module.exports = Backbone.Router.extend({
         var holdData;
 
         var me = this;
-//        template.fetch({
-//            success: function(data) {
-//                var s = "hod";
-//                holdData = data;
-//
-//                me.showView(new TodayView({model: holdData}));
-//                me.navigate('today');
-//            }
-//        });
-
-//        var goals = new Goals();
-//        var data2;
-//        goals.fetch({
-//            success: function(data) {
-//                data2 = data;
-//
-//                me.showView(new TodayView({collection: data}));
-//                me.navigate('today');
-//            }
-//        });
 
         this.showView(new TodayView(/*{model: holdData}*/));
         this.navigate('today');
     },
     add: function() {
-        me = this;
+        //me = this;
         //me.slider.slidePage(new AddView().$el);
-        me.showView(new AddView());
-        me.navigate('add');
+        this.showView(new AddView());
+        this.navigate('add');
     },
     navigateStep: function(stepName) {
         if(this[stepName] !== undefined) {
