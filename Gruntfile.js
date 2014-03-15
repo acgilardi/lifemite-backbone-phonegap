@@ -82,8 +82,20 @@ module.exports = function (grunt) {
 
         copy: {
             test: {
-                src: './SpecRunner.html',
-                dest: 'build/SpecRunner.html'
+                files: [
+                    {
+                        src: './SpecRunner.html',
+                        dest: 'build/SpecRunner.html'
+                    }, {
+                        src: './SpecRunner_override.css',
+                        dest: 'build/SpecRunner_override.css'
+                    }, {
+                        expand: true,
+                        flatten: true,
+                        src: 'client/locales/*',
+                        dest: 'build/locales/'
+                    }
+                ]
             },
             dev: {
                 files: [
@@ -197,23 +209,10 @@ module.exports = function (grunt) {
     // Custom tasks
     grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor', 'browserify:flatui', 'copy:test']);
 
-    grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'less:transpile', 'concat', 'copy:dev', 'uglify'])
+    grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'less:transpile', 'concat', 'copy:dev', 'uglify']);
     grunt.registerTask('build:test', ['browserify:app', 'browserify:test']);
 
     grunt.registerTask('tdd', ['karma:unit','watch']);
 
     grunt.registerTask('server', ['watch']);
-
-    //grunt.registerTask('min', ['uglify']); // polyfil for uglify
-//    grunt.registerTask('debug', 'Create a debug build', function (platform) {
-//        grunt.task.run('jshint', 'concat', 'min');
-//        grunt.task.run('shell:debug_' + platform);
-//    });
-
-    // Default task
-    //grunt.registerTask('default', ['watch']);
-
-
-
-
 };

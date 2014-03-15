@@ -1,12 +1,12 @@
 var Backbone = require('backbone'),
     TodayView = require('./views/today'),
-    AddView = require('./views/add'),
-    Template = require('./models/template'),
-    Templates = require('./collections/templates'),
-    Goal = require('./models/goal'),
-    Goals = require('./collections/goals'),
+//    AddView = require('./views/add'),
+//    Template = require('./models/template'),
+//    Templates = require('./collections/templates'),
+//    Goal = require('./models/goal'),
+//    Goals = require('./collections/goals'),
     PageSlider = require('./services/pageslider');
-
+//
 var Router = module.exports = Backbone.Router.extend({
     initialize: function(options) {
         this.views = ['today', 'add'];
@@ -16,32 +16,31 @@ var Router = module.exports = Backbone.Router.extend({
         '': 'root',
         ':step': 'navigateStep',
         'settings': 'settingsDetails'
-
     },
     root: function() {
         this.today();
     },
 
-    // handle data
-    settingsDetails: function() {
-
-    },
-
+//    // handle data
+//    settingsDetails: function() {
+//
+//    },
+//
     today: function() {
-        var template = new Template({id: 1});
-        var holdData;
-
-        var me = this;
-
+//        var template = new Template({id: 1});
+//        var holdData;
+//
+//        var me = this;
+//
         this.showView(new TodayView(/*{model: holdData}*/));
         this.navigate('today');
     },
-    add: function() {
-        //me = this;
-        //me.slider.slidePage(new AddView().$el);
-        this.showView(new AddView());
-        this.navigate('add');
-    },
+//    add: function() {
+//        //me = this;
+//        //me.slider.slidePage(new AddView().$el);
+//        this.showView(new AddView());
+//        this.navigate('add');
+//    },
     navigateStep: function(stepName) {
         if(this[stepName] !== undefined) {
             this[stepName]();

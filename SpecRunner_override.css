@@ -1,0 +1,35 @@
+/* Main Item */
+/*div.summary > div > a:first-child{*/
+/*padding-bottom: 10px;*/
+/*}*/
+
+/* Story */
+div.summary > div > div {
+    padding-top: 5px;
+}
+div.summary > div > div > a:first-child {
+    font-style: italic;
+}
+
+/* Scenario */
+div.summary > div > div > div {
+    padding-top: 5px;
+}
+div.summary > div > div > div > a:first-child {
+    font-weight: bold;
+}
+
+/* Given */
+div.summary > div > div > div > div > a:first-child {
+    margin-left: 0;
+}
+
+/* Scenario */
+div.summary > div > div > div > div > div > a:first-child {
+    margin-left: -14px;
+}
+
+/* Scenario */
+div.summary > div > div > div > div > div > div > a:first-child {
+    margin-left: -28px;
+}

@@ -1,64 +1,64 @@
-require('./app_config');
+require('./config');
 
 var Jquery = require('jquery'),
-    Router = require('./router'),
-    Helpers = require('./helpers'),
-    Preferences = require('./models/preferences'),
     Backbone = require('backbone'),
-    DataService = require('./services/data'),
-    Upgrades = require('./services/upgrades'),
     I18n = require('./services/i18n'),
-    Templates = require('./collections/templates');
+    Router = require('./router');
+    //Helpers = require('./helpers'),
+    //Preferences = require('./models/preferences'),
+    //DataService = require('./services/data'),
+    //Upgrades = require('./services/upgrades'),
+
+    //Templates = require('./collections/templates');
 
 Backbone.$ = Jquery;
 
 var App = module.exports = function(){};
 
 App.prototype = {
+    config: {},
     loc: {},
     views: {},
-    models: {},
-    collections: {},
-    router: {},
-    db: {},
-
+//    models: {},
+//    collections: {},
+//    router: {},
+//    db: {},
+//
     initialize: function() {
+        this.config = config;
         this.bindEvents();
         this.loc = new I18n({
-            //these are the default values, you can omit
             directory: "locales",
-            locale: AppConfig.language,
+            locale: this.config.language,
             extension: ".json"
         });
+
         this.router = new Router();
-
-        var me = this;
-
-        // instantiate indexeddb
-        var options = {
-            databaseName: AppConfig.databaseName,
-            version: AppConfig.databaseVersion,
-            forceNew: AppConfig.databaseForceRebuild,
-            upgrades: Upgrades()
-        };
-        DataService(options, function(error, db) {
-            console.log('DataService complete');
-            me.db = db;
-
-            // get templates
-            me.collections.templates = new Templates();
-            me.collections.templates.fetch({
-                success: function(data) {
-                    console.log('templates fetched');
-                    Backbone.history.start();
-                }
-            });
-
-            //me.models.settings = new Settings();
-
-
-
-        });
+//
+//        var me = this;
+//
+//        // instantiate indexeddb
+//        var options = {
+//            databaseName: AppConfig.databaseName,
+//            version: AppConfig.databaseVersion,
+//            forceNew: AppConfig.databaseForceRebuild,
+//            upgrades: Upgrades()
+//        };
+//        DataService(options, function(error, db) {
+//            console.log('DataService complete');
+//            me.db = db;
+//
+//            // get templates
+//            me.collections.templates = new Templates();
+//            me.collections.templates.fetch({
+//                success: function(data) {
+//                    console.log('templates fetched');
+                        if(!Backbone.History.started) {
+                            Backbone.history.start();
+                        }
+//                }
+//            });
+//        });
     },
     // Bind Event Listeners
     // Bind any events that are required on startup. Common events are:
