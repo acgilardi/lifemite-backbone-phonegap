@@ -8,11 +8,16 @@ scenario = function(scenarioName, given, test) {
     });
 };
 
-require('jasmine-expect');
 
 /* global app, require, jasmine, beforeEach, afterEach, sinon, AW */
 (function(){
     'use strict';
+
+
+    require('jasmine-expect');
+
+    config.dbName = 'lifemitedb_test';
+    config.dbForceNew = true;
 
     var Backbone = require('backbone');
        /// $ = require('jquery');
@@ -21,6 +26,8 @@ require('jasmine-expect');
         if(Backbone.History.started) {
             Backbone.history.stop();
         }
+
+
 
         this.addMatchers({
             toBeA: function(expected) {

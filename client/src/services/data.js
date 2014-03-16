@@ -226,7 +226,7 @@ var DataService = module.exports = function (options, callback) {
     var db;
     var openDbRequest;
     var openDatabase = function() {
-        openDbRequest = window.indexedDB.open(options.databaseName, options.version);
+        openDbRequest = window.indexedDB.open(options.name, options.version);
         openDbRequest.onerror = function (event) {
             console.log('browserdb: error');
         };
@@ -276,8 +276,9 @@ var DataService = module.exports = function (options, callback) {
     };
 
     if(options.forceNew) {
-        var reqDelete = window.indexedDB.deleteDatabase(options.databaseName);
+        var reqDelete = window.indexedDB.deleteDatabase(options.name);
         reqDelete.onerror = function(event) {
+            console.log('error deleting database');
         };
         reqDelete.onsuccess = function(event) {
             openDatabase();

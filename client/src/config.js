@@ -1,7 +1,6 @@
 config = {
-//    databaseName: 'lifemitedb',
-//    databaseVersion: 1,
-//    databaseForceRebuild: true,
-//    //language: 'de'
+    dbName: 'lifemitedb',
+    dbVersion: 1,
+    dbForceNew: true,
     language: navigator.language.toLowerCase()
 };

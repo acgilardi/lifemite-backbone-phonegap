@@ -36,7 +36,8 @@ module.exports = function (grunt) {
                         'client/vendor/jquery/js/jquery.js:jquery',
                         'client/vendor/backbone/js/backbone.js:backbone',
                         'client/vendor/underscore/js/underscore.js:underscore',
-                        'client/vendor/sprintf/js/sprintf.js:sprintf'
+                        'client/vendor/sprintf/js/sprintf.js:sprintf',
+                        'client/vendor/async/js/async.js:async'
                     ]
                 }
             },
@@ -50,7 +51,7 @@ module.exports = function (grunt) {
                 },
                 options: {
                     transform: ['hbsfy'],
-                    external: ['jquery', 'underscore', 'backbone', 'sprintf']
+                    external: ['jquery', 'underscore', 'backbone', 'sprintf', 'async']
                 }
             },
             test: {
@@ -59,29 +60,29 @@ module.exports = function (grunt) {
                 },
                 options: {
                     transform: ['hbsfy'],
-                    external: ['jquery', 'underscore', 'backbone', 'sprintf']
+                    external: ['jquery', 'underscore', 'backbone', 'sprintf', 'async']
                 }
             }
         },
 
-        less: {
-            transpile: {
-                files: {
-                    'build/<%= pkg.name %>.css': [
-                        'client/vendor/*/css/*',
-                        'client/css/**/*.css',
-                        'client/less/**/*.less'
-                    ]
-                }
-            }
-        },
+//        less: {
+//            transpile: {
+//                files: {
+//                    'build/<%= pkg.name %>.css': [
+//                        'client/vendor/*/css/*',
+//                        'client/css/**/*.css',
+//                        'client/less/**/*.less'
+//                    ]
+//                }
+//            }
+//        },
 
         concat: {
             'build/<%= pkg.name %>.js': ['build/vendor.js','build/flatui.js', 'build/app.js']
         },
 
         copy: {
-            test: {
+            initial: {
                 files: [
                     {
                         src: './SpecRunner.html',
@@ -94,18 +95,7 @@ module.exports = function (grunt) {
                         flatten: true,
                         src: 'client/locales/*',
                         dest: 'build/locales/'
-                    }
-                ]
-            },
-            dev: {
-                files: [
-                    {
-                        src: 'build/<%= pkg.name %>.js',
-                        dest: 'www/js/<%= pkg.name %>.js'
-                    }, {
-                        src: 'build/<%= pkg.name %>.css',
-                        dest: 'www/css/<%= pkg.name %>.css'
-                    }, {
+                    },{
                         expand: true,
                         flatten: true,
                         src: 'client/img/*',
@@ -136,7 +126,23 @@ module.exports = function (grunt) {
                         expand: true,
                         flatten: true,
                         src: 'client/locales/*',
-                        dest: 'www/locales/'
+                        dest: 'build/locales'
+                    }, {
+                        expand: true,
+                        flatten: true,
+                        src: 'client/locales/*',
+                        dest: 'www/locales'
+                    }
+                ]
+            },
+            dev: {
+                files: [
+                    {
+                        src: 'build/<%= pkg.name %>.js',
+                        dest: 'www/js/<%= pkg.name %>.js'
+                    }, {
+                        src: 'build/<%= pkg.name %>.css',
+                        dest: 'www/css/<%= pkg.name %>.css'
                     }
                 ]
             }
@@ -174,7 +180,7 @@ module.exports = function (grunt) {
             files: [
                 ['client/src/**/*.js', 'client/spec/**/*.js', 'client/templates/**/*.hbs']
             ],
-            tasks: ['build'],
+            tasks: ['build:dev'],
             karma: {
                 files: ['client/src/**/*.js', 'client/spec/**/*.js'],
                 tasks: ['karma:unit:run']
@@ -192,8 +198,8 @@ module.exports = function (grunt) {
 
     // Load tasks
     grunt.loadNpmTasks('grunt-browserify');
-    grunt.loadNpmTasks('grunt-bower');
-    grunt.loadNpmTasks('grunt-bower-task');
+    //grunt.loadNpmTasks('grunt-bower');
+    //grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -201,18 +207,30 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-karma');
-    grunt.loadNpmTasks('hbsfy');
     grunt.loadNpmTasks('grunt-contrib-handlebars');
-    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('hbsfy');
+
+    //grunt.loadNpmTasks('grunt-contrib-less');
+
+
+    grunt.registerTask('load-bower', [], function () {
+        grunt.loadNpmTasks('grunt-bower');
+        grunt.loadNpmTasks('grunt-bower-task');
+        grunt.task.run('bower');
+    });
 
 
     // Custom tasks
-    grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor', 'browserify:flatui', 'copy:test']);
+    grunt.registerTask('init:dev', ['clean', 'load-bower', 'browserify:vendor', 'browserify:flatui', 'copy:initial']);
 
-    grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'less:transpile', 'concat', 'copy:dev', 'uglify']);
-    grunt.registerTask('build:test', ['browserify:app', 'browserify:test']);
+    grunt.registerTask('build:prod', ['clean:dev', 'browserify:app', 'browserify:test', 'concat', 'copy:dev', 'uglify']);
 
-    grunt.registerTask('tdd', ['karma:unit','watch']);
+    grunt.registerTask('build:dev', ['clean:dev', 'browserify:app', 'browserify:test', 'concat', 'copy:dev']);
 
-    grunt.registerTask('server', ['watch']);
+   // grunt.registerTask('build', ['clean:dev', 'browserify:app', 'browserify:test', 'less:transpile', 'concat', 'copy:dev', 'uglify']);
+    //grunt.registerTask('build:test', ['browserify:app', 'browserify:test']);
+
+    //grunt.registerTask('tdd', ['karma:unit','watch']);
+
+    grunt.registerTask('server', ['build:dev', 'watch']);
 };

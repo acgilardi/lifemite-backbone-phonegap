@@ -3,11 +3,12 @@ require('./config');
 var Jquery = require('jquery'),
     Backbone = require('backbone'),
     I18n = require('./services/i18n'),
-    Router = require('./router');
+    Router = require('./router'),
+    async = require('async'),
     //Helpers = require('./helpers'),
-    //Preferences = require('./models/preferences'),
-    //DataService = require('./services/data'),
-    //Upgrades = require('./services/upgrades'),
+    Preference = require('./models/preference'),
+    DataService = require('./services/data'),
+    Upgrades = require('./services/upgrades');
 
     //Templates = require('./collections/templates');
 
@@ -16,13 +17,14 @@ Backbone.$ = Jquery;
 var App = module.exports = function(){};
 
 App.prototype = {
+    initialized: false,
     config: {},
     loc: {},
     views: {},
-//    models: {},
+    models: {},
 //    collections: {},
 //    router: {},
-//    db: {},
+    db: {},
 //
     initialize: function() {
         this.config = config;
@@ -34,31 +36,60 @@ App.prototype = {
         });
 
         this.router = new Router();
+
+        var me = this;
+
+        // instantiate indexeddb
+        var options = {
+            name: this.config.dbName,
+            version: this.config.dbVersion,
+            forceNew: this.config.dbForceNew,
+            upgrades: Upgrades()
+        };
+        DataService(options, function(error, db) {
+            console.log('DataService complete');
+            me.db = db;
+            me.config.forceNew = false;
+
+            //load initial data
+            async.series({
+                    preference: function(callback){
+                        me.models.preference = new Preference();
+                        me.models.preference.fetch({
+                            success: function(data) {
+                                callback(null, data);
+                            }
+                        });
+                    },
+//                    two: function(callback){
+//                        setTimeout(function(){
+//                            callback(null, 2);
+//                        }, 100);
+//                    }
+                },
+                function(err, results) {
+                    // results is now equal to: {one: 1, two: 2}
+                    console.log('async fetch done');
+                    me.initialized = true;
+                    if(!Backbone.History.started) {
+                        Backbone.history.start();
+                    }
+                });
+
+            //get preferences
+
+            // get templates
+            //me.collections.templates = new Templates();
+            //me.collections.templates.fetch({
+            //    success: function(data) {
+            //        console.log('templates fetched');
+//            return true; if(!Backbone.History.started) {
+//                            Backbone.history.start();
+//                        }
 //
-//        var me = this;
-//
-//        // instantiate indexeddb
-//        var options = {
-//            databaseName: AppConfig.databaseName,
-//            version: AppConfig.databaseVersion,
-//            forceNew: AppConfig.databaseForceRebuild,
-//            upgrades: Upgrades()
-//        };
-//        DataService(options, function(error, db) {
-//            console.log('DataService complete');
-//            me.db = db;
-//
-//            // get templates
-//            me.collections.templates = new Templates();
-//            me.collections.templates.fetch({
-//                success: function(data) {
-//                    console.log('templates fetched');
-                        if(!Backbone.History.started) {
-                            Backbone.history.start();
-                        }
-//                }
-//            });
-//        });
+            //    }
+            //});
+        });
     },
     // Bind Event Listeners
     // Bind any events that are required on startup. Common events are:

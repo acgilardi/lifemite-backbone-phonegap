@@ -1,17 +1,32 @@
 require('./spec_helper');
 
-
 var App = require('../src/app.js'),
     Backbone = require('backbone'),
     _ = require('underscore'),
     TodayView = require('../src/views/today');
 
+
+
+
+
 describe('lifeMite App', function() {
 
+
+
     beforeEach(function() {
-        //Backbone.history.stop();
         app = new App();
-        app.initialize();
+        config.dbForceNew = false;
+
+        function initApp(){
+            app.initialize();
+        }
+        runs(initApp);
+        waitsFor(function(){
+            return app.initialized;
+        });
+    });
+    afterEach(function () {
+        app = undefined;
     });
 
     story('As a user, I can launch the app, So that I can interact with it',
@@ -41,24 +56,62 @@ describe('lifeMite App', function() {
                 function () {
                     // languages supported English, Korean, Spanish, Russian, German, Japanese, French, Portugese
                     describe('WHEN: the app is running', function () {
-                        it('THEN: core text is present in defined language', function () {
-                            var data = [
-                                {language: 'en-us', word: 'cat'},
-                                {language: 'ko', word: '고양이'},
-                                {language: 'es', word: 'gato'},
-                                {language: 'ru', word: 'кошка'},
-                                {language: 'de', word: 'Katze'},
-                                {language: 'ja', word: '猫'},
-                                {language: 'fr', word: 'chat'},
-                                {language: 'pt', word: 'gato'},
-                            ];
 
-                            _.each(data, function(item, index, items) {
-                                app.config.language = item.language;
-                                app.initialize();
-                                expect(app.loc.__('test-word-cat')).toEqual(item.word);
-                            }, app);
+                        var data = {
+                            'en-us': 'cat',
+                            'ko': '고양이',
+                            'es': 'gato',
+                            'ru': 'кошка',
+                            'de': 'Katze',
+                            'ja': '猫',
+                            'fr': 'chat',
+                            'pt': 'gato'
+                        };
+                        var testLocale;
 
+                        beforeEach(function() {
+                            testLocale = function(locale) {
+                                app.config.language = locale;
+                                app.initialized = false;
+
+                                function initApp(){
+                                    app.initialize();
+                                }
+                                function test(){
+                                   expect(app.loc.__('test-word-cat')).toEqual(data[locale]);
+                                }
+
+                                runs(initApp);
+                                waitsFor(function(){
+                                    return app.initialized;
+                                });
+                                runs(test);
+                            };
+                        });
+
+                        it('THEN: present text in English', function () {
+                            expect(app.loc.__('test-word-cat')).toEqual(data['en-us']);
+                        });
+                        it('OR present text in Korean', function () {
+                            testLocale('ko');
+                        });
+                        it('OR present text in Spanish', function () {
+                            testLocale('es');
+                        });
+                        it('OR present text in Russian', function () {
+                            testLocale('ru');
+                        });
+                        it('OR present text in German', function () {
+                            testLocale('de');
+                        });
+                        it('OR present text in Japanese', function () {
+                            testLocale('ja');
+                        });
+                        it('OR present text in French', function () {
+                            testLocale('fr');
+                        });
+                        it('OR present text in Portuguese', function () {
+                            testLocale('pt');
                         });
                     });
                 }
@@ -84,46 +137,6 @@ describe('lifeMite App', function() {
 
         }
     ); // end story
-});
 
-//    describe('As a user, I can launch the app, so that I can interact with it', function () {
-//
-//        scenario(
-//            'Scenario: Starting the app',
-//            'Given: the app is not started',
-//            function() {
-//                describe('When: user starts the app', function () {
-//                    it('Then: a new instance of the app will launch', function () {
-//                        expect(app).toBeDefined();
-//                    });
-//                });
-//            }
-//        );
-//
-//    });
-//
-//
-//
-//    describe('Scenario: Today view first', function () {
-//        describe('Given the app is not started', function () {
-//            describe('When user starts the app', function () {
-//                it('Then the today view will be shown', function () {
-//                    expect(app).toBeDefined();
-//                });
-//            });
-//        });
-//    });
-//
-//    it('should present text in my devices language', function () {
-//        var catEnglish = "cat";
-//        var catGerman = "Katze";
-//
-//        appConfig.language = 'de';
-//        app.initialize();
-//        expect(app.loc.__('test-word-cat')).toEqual(catGerman);
-//
-//        appConfig.language = 'en-us';
-//        app.initialize();
-//        expect(app.loc.__('test-word-cat')).toEqual(catEnglish);
-//    });
+});
 

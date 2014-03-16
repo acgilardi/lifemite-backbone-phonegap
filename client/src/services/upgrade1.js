@@ -76,22 +76,8 @@ var Upgrade1 = module.exports = function() {
             ],
             "preference": [
                 {
-                    "name": "PrefsSet",
-                    "description": "Did the user visit the preferences yet",
-                    "value": false,
-                    "initialvalue": false
-                },
-                {
-                    "name": "Units",
-                    "description": "Units for distance measurements",
-                    "value": "standard",
-                    "initialvalue": "standard"
-                },
-                {
-                    "name": "ShownStartup",
-                    "description": "Shown the startup screen(s)",
-                    "value": false,
-                    "initialvalue": false
+                    "firstVisit": true,
+                    "locale": "en-US"
                 }
             ],
             "template": [

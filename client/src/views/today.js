@@ -27,7 +27,9 @@ var TodayView = module.exports = Backbone.View.extend({
 //
 //        return this;
     },
+    presentGuide: function() {
 
+    }
 //    onAdd: function() {
 //        //app.router.add();
 //    }
