@@ -1,9 +1,9 @@
 //require('./spec_helper');
 //
 //var App = require('../src/app.js'),
-//    Backbone = require('backbone'),
-//    _ = require('underscore'),
-//    TodayView = require('../src/views/today');
+// Backbone = require('backbone'),
+    _ = require('underscore'),
+    TodayView = require('../src/views/today');
 //
 //config.dbName = 'lifemitedb_test';
 //config.dbForceNew = true;
