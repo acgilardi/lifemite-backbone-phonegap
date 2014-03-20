@@ -1,33 +1,8 @@
-require('./spec_helper');
-
-var App = require('../src/app.js'),
-    Backbone = require('backbone'),
+var Backbone = require('backbone'),
     _ = require('underscore'),
     TodayView = require('../src/views/today');
 
-
-
-
-
 describe('lifeMite App', function() {
-
-
-
-    beforeEach(function() {
-        app = new App();
-        config.dbForceNew = false;
-
-        function initApp(){
-            app.initialize();
-        }
-        runs(initApp);
-        waitsFor(function(){
-            return app.initialized;
-        });
-    });
-    afterEach(function () {
-        app = undefined;
-    });
 
     story('As a user, I can launch the app, So that I can interact with it',
         function() {

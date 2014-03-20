@@ -5,18 +5,18 @@ var Jquery = require('jquery'),
     I18n = require('./services/i18n'),
     Router = require('./router'),
     async = require('async'),
-    //Helpers = require('./helpers'),
     Preference = require('./models/preference'),
     DataService = require('./services/data'),
     Upgrades = require('./services/upgrades');
 
     //Templates = require('./collections/templates');
 
+require('./helpers');
 Backbone.$ = Jquery;
 
-var App = module.exports = function(){};
+window.App = module.exports = function(){};
 
-App.prototype = {
+window.App.prototype = {
     initialized: false,
     config: {},
     loc: {},
@@ -72,6 +72,7 @@ App.prototype = {
                     console.log('async fetch done');
                     me.initialized = true;
                     if(!Backbone.History.started) {
+                        console.log(app);
                         Backbone.history.start();
                     }
                 });

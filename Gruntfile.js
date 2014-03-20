@@ -56,7 +56,7 @@ module.exports = function (grunt) {
             },
             test: {
                 files: {
-                    'build/spec.js': ['client/spec/**/*.test.js']
+                    'build/spec.js':['client/spec/spec_helper.js','client/spec/**/*.test.js']
                 },
                 options: {
                     transform: ['hbsfy'],

@@ -14,8 +14,7 @@ var Router = module.exports = Backbone.Router.extend({
     },
     routes: {
         '': 'root',
-        ':step': 'navigateStep',
-        'settings': 'settingsDetails'
+        ':step': 'navigateStep'
     },
     root: function() {
         this.today();

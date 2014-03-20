@@ -12,6 +12,7 @@ var TodayView = module.exports = Backbone.View.extend({
         //'click #nav-add': 'onAdd'
     },
     render: function() {
+
 //        this.$el.html(this.template());
 //
 //
@@ -24,7 +25,13 @@ var TodayView = module.exports = Backbone.View.extend({
 //                self.assign('#goals-view', view);
 //            }
 //        });
-//
+
+        // show guide on first visit
+        if (app.models.preference.get('firstVisit') === true) {
+            this.presentGuide();
+        }
+
+
 //        return this;
     },
     presentGuide: function() {
