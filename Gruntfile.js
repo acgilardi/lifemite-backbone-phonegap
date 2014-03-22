@@ -78,7 +78,12 @@ module.exports = function (grunt) {
 //        },
 
         concat: {
-            'build/<%= pkg.name %>.js': ['build/vendor.js','build/flatui.js', 'build/app.js']
+            'build/<%= pkg.name %>.js': ['build/vendor.js','build/flatui.js', 'build/app.js'],
+            'build/<%= pkg.name %>.css': [
+                'client/vendor/*/css/*',
+                'client/css/**/*.css',
+                'client/less/**/*.less'
+            ]
         },
 
         copy: {

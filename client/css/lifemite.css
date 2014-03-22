@@ -98,3 +98,31 @@
 .goal-selector-block-label {
     display: block;
 }
+
+.splash-image
+{
+    width: 100%;
+    height:auto;
+    opacity: .2;
+}
+.splash-page
+{
+    width: 100%;
+    height:auto;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    position: absolute;
+}
+
+.splash-message
+{
+    width: 100%;
+    text-align: center;
+    height:auto;
+    padding-top: 10%;
+    top: 0px;
+    left: 0px;
+    z-index: 999;
+    position: absolute;
+}
