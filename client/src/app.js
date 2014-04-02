@@ -18,17 +18,17 @@ window.App = module.exports = function(){};
 
 window.App.prototype = {
     initialized: false,
-    config: {},
+    //config: {},
     loc: {},
     views: {},
-    models: {},
+    //models: {},
 //    collections: {},
-//    router: {},
+    router: {},
     db: {},
 //
     initialize: function() {
-        this.config = config;
         this.bindEvents();
+        this.config = config;
         this.loc = new I18n({
             directory: "locales",
             locale: this.config.language,
@@ -39,7 +39,7 @@ window.App.prototype = {
 
         var me = this;
 
-        // instantiate indexeddb
+        //instantiate indexeddb
         var options = {
             name: this.config.dbName,
             version: this.config.dbVersion,
@@ -47,65 +47,75 @@ window.App.prototype = {
             upgrades: Upgrades()
         };
         DataService(options, function(error, db) {
-            console.log('DataService complete');
+            console.log('database loaded - forceNew:' + options.forceNew);
             me.db = db;
             me.config.forceNew = false;
-
-            //load initial data
-            async.series({
-                    preference: function(callback){
-                        me.models.preference = new Preference();
-                        me.models.preference.fetch({
-                            success: function(data) {
-                                callback(null, data);
-                            }
-                        });
-                    },
-//                    two: function(callback){
-//                        setTimeout(function(){
-//                            callback(null, 2);
-//                        }, 100);
-//                    }
-                },
-                function(err, results) {
-                    // results is now equal to: {one: 1, two: 2}
-                    console.log('async fetch done');
+//
+//            //load initial data
+//            async.series({
+//                    preference: function(callback){
+//                        me.models.preference = new Preference();
+//                        me.models.preference.fetch({
+//                            success: function(data) {
+//                                callback(null, data);
+//                            }
+//                        });
+//                    },
+////                    two: function(callback){
+////                        setTimeout(function(){
+////                            callback(null, 2);
+////                        }, 100);
+////                    }
+//                },
+//                function(err, results) {
+//                    // results is now equal to: {one: 1, two: 2}
+//                    console.log('async fetch done');
                     me.initialized = true;
                     if(!Backbone.History.started) {
-                        console.log(app);
+                        console.log('backbone history start');
                         Backbone.history.start();
                     }
-                });
-
-            //get preferences
-
-            // get templates
-            //me.collections.templates = new Templates();
-            //me.collections.templates.fetch({
-            //    success: function(data) {
-            //        console.log('templates fetched');
-//            return true; if(!Backbone.History.started) {
-//                            Backbone.history.start();
-//                        }
+//                });
 //
-            //    }
-            //});
+//            //get preferences
+//
+//            // get templates
+//            //me.collections.templates = new Templates();
+//            //me.collections.templates.fetch({
+//            //    success: function(data) {
+//            //        console.log('templates fetched');
+////            return true; if(!Backbone.History.started) {
+////                            Backbone.history.start();
+////                        }
+////
+//            //    }
+//            //});
         });
     },
-    // Bind Event Listeners
-    // Bind any events that are required on startup. Common events are:
-    // 'load', 'deviceready', 'offline', and 'online'.
+
+    /**
+     * Bind event listeners. Bind any events that are required on startup.
+     * common events are 'load', 'deviceready', 'offline' and 'online'
+     */
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     },
-    // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicity call 'app.receivedEvent(...);'
+
+
+    /**
+     * deviceready Event Handler
+     * The scope of 'this' is the event. In order to call the 'receivedEvent'
+     * function, we must explicity call 'app.receivedEvent(...);'
+     */
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
     },
-    // Update DOM on a Received Event
+
+
+    /**
+     * Update DOM on a received event
+     * @param id element id that raised the event
+     */
     receivedEvent: function(id) {
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');

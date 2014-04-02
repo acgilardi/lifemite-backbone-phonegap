@@ -9,12 +9,13 @@ var Backbone = require('backbone'),
 //
 var Router = module.exports = Backbone.Router.extend({
     initialize: function(options) {
-        this.views = ['today', 'add'];
-        this.slider = new PageSlider($('body'));
+//        this.views = ['today', 'add'];
+//        this.slider = new PageSlider($('body'));
     },
     routes: {
         '': 'root',
-        ':step': 'navigateStep'
+        'today': 'today'
+//        ':step': 'navigateStep'
     },
     root: function() {
         this.today();
@@ -26,11 +27,11 @@ var Router = module.exports = Backbone.Router.extend({
 //    },
 //
     today: function() {
-//        var template = new Template({id: 1});
-//        var holdData;
-//
-//        var me = this;
-//
+////        var template = new Template({id: 1});
+////        var holdData;
+////
+////        var me = this;
+////
         this.showView(new TodayView(/*{model: holdData}*/));
         this.navigate('today');
     },
@@ -40,18 +41,18 @@ var Router = module.exports = Backbone.Router.extend({
 //        this.showView(new AddView());
 //        this.navigate('add');
 //    },
-    navigateStep: function(stepName) {
-        if(this[stepName] !== undefined) {
-            this[stepName]();
-        }
-    },
+//    navigateStep: function(stepName) {
+//        if(this[stepName] !== undefined) {
+//            this[stepName]();
+//        }
+//    },
     showView: function(view) {
         this.destroyCurrentView();
 
         app.views.currentView = view;
         //app.views.currentView.setElement(Backbone.$('.lifemite-app')).render();
         //view.render();
-        this.slider.slidePage(view.$el);
+        //this.slider.slidePage(view.$el);
     },
     destroyCurrentView: function() {
         if(app.views.currentView) {

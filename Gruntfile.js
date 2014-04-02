@@ -93,9 +93,6 @@ module.exports = function (grunt) {
                         src: './SpecRunner.html',
                         dest: 'build/SpecRunner.html'
                     }, {
-                        src: './SpecRunner_override.css',
-                        dest: 'build/SpecRunner_override.css'
-                    }, {
                         expand: true,
                         flatten: true,
                         src: 'client/locales/*',

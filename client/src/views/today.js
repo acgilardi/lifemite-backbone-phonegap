@@ -26,24 +26,24 @@ var TodayView = module.exports = Backbone.View.extend({
 //            }
 //        });
 
-        // show guide on first visit
-        if (app.models.preference.get('firstVisit') === true) {
-            this.presentGuide();
-            app.models.preference.set('firstVisit', false);
-
-            app.models.preference.save({
-                success: function(data) {
-                    //callback(null, data);
-                }
-            });
-        }
+//        // show guide on first visit
+//        if (app.models.preference.get('firstVisit') === true) {
+//            this.presentGuide();
+//            app.models.preference.set('firstVisit', false);
+//
+//            app.models.preference.save({
+//                success: function(data) {
+//                    //callback(null, data);
+//                }
+//            });
+//        }
 
 
 //        return this;
     },
-    presentGuide: function() {
-        this.$('.splash-page').show();
-    }
+//    presentGuide: function() {
+//        this.$('.splash-page').show();
+//    }
 //    onAdd: function() {
 //        //app.router.add();
 //    }

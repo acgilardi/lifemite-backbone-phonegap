@@ -1,15 +1,6 @@
 /* global app, require, jasmine, beforeEach, afterEach */
 
 
-story = function(storyName, scenarios) {
-    describe(storyName, scenarios);
-};
-
-scenario = function(scenarioName, given, test) {
-    describe(scenarioName, function () {
-        describe(given, test);
-    });
-};
 
 (function(){
     'use strict';
@@ -22,6 +13,8 @@ scenario = function(scenarioName, given, test) {
     config.dbName = 'lifemitedb_test';
     config.dbForceNew = true;
 
+
+
     beforeEach(function() {
         if(Backbone.History.started) {
             Backbone.history.stop();
@@ -33,6 +26,18 @@ scenario = function(scenarioName, given, test) {
             }
         });
 
+        this.helper = {
+            trigger: function(obj, name) {
+                var e = document.createEvent('Event');
+                e.initEvent(name, true, true);
+                obj.dispatchEvent(e);
+            },
+            getComputedStyle: function(querySelector, property) {
+                var element = document.querySelector(querySelector);
+                return window.getComputedStyle(element).getPropertyValue(property);
+            }
+        };
+        Backbone.$('<div id="lifemite-app" class="lifemite-app"></div>').appendTo('body');
 
         // initialize the app. This is async so wait
         window.app = new App();
@@ -51,6 +56,7 @@ scenario = function(scenarioName, given, test) {
         if(Backbone.History.started) {
             Backbone.history.stop();
         }
+        Backbone.$('.js-nue-app').remove();
     });
 
 })();
